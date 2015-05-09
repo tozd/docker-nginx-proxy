@@ -40,7 +40,14 @@ upstream {{ $host }}{{ replace $url "/" "-" -1 }}u {
 {{ if (and (exists (printf "/ssl/%s.crt" $host)) (exists (printf "/ssl/%s.key" $host))) }}
 server {
     server_name {{ $host }};
-    return 301 https://$host$request_uri;
+
+    {{ if (exists (printf "/ssl/%s_nonssl.conf" $host)) }}
+    include /ssl/{{ $host }}_nonssl.conf;
+    {{ end }}
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
 }
 
 server {
@@ -51,6 +58,10 @@ server {
 
     ssl_certificate /ssl/{{ $host }}.crt;
     ssl_certificate_key /ssl/{{ $host }}.key;
+
+    {{ if (exists (printf "/ssl/%s_ssl.conf" $host)) }}
+    include /ssl/{{ $host }}_ssl.conf;
+    {{ end }}
 
     add_header Strict-Transport-Security "max-age=31536000";
 {{ else }}
