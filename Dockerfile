@@ -1,6 +1,4 @@
-FROM wlanslovenija/nginx
-
-MAINTAINER Jernej Kos <jernej@kos.mx>
+FROM tozd/nginx
 
 RUN apt-get update -q -q && \
  apt-get install wget ca-certificates --yes --force-yes && \
