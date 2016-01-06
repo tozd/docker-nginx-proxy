@@ -1,5 +1,7 @@
 FROM tozd/nginx
 
+EXPOSE 80/tcp 443/tcp
+
 RUN apt-get update -q -q && \
  apt-get install wget ca-certificates --yes --force-yes && \
  mkdir /dockergen && \
