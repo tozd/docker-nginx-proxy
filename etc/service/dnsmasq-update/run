@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Force reload of domains every 60 seconds.
+while true; do
+  sleep 60
+  if [ -f /var/run/dnsmasq.pid ]; then
+    kill -HUP $(cat /var/run/dnsmasq.pid)
+  fi
+done

@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+# Has to run as root otherwise it tries to keep some capabilities and it fails inside Docker.
+exec /usr/sbin/dnsmasq --listen-address=127.0.0.1 --keep-in-foreground --bind-interfaces --log-facility=- --user=root --cache-size=0 2>&1
