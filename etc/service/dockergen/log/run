@@ -4,4 +4,3 @@ mkdir -p /var/log/dockergen
 chown nobody:nogroup /var/log/dockergen
 
 exec chpst -u nobody:nogroup svlogd -tt /var/log/dockergen
-
