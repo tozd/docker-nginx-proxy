@@ -2,7 +2,7 @@
 
 {{ range $host, $containersByHost := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 
-{{ range $url, $containers := groupBy $containersByHost "Env.VIRTUAL_URL" }}
+{{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
 upstream {{ $host }}{{ replace $url "/" "-" -1 }}u {
     {{ range $index, $value := $containers }}
         {{ $addrLen := len $value.Addresses }}
@@ -68,7 +68,7 @@ server {
     server_name {{ $host }} *.{{ $host }};
     access_log /var/log/nginx/{{ $host }}_access.log;
 
-{{ range $url, $containers := groupBy $containersByHost "Env.VIRTUAL_URL" }}
+{{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
     location {{ $url }} {
         proxy_pass http://{{ $host }}{{ replace $url "/" "-" -1 }}u/;
     }
