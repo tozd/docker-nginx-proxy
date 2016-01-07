@@ -77,5 +77,5 @@ This assumes that you have a container with hostname `example`:
 docker run --name example --hostname example ...
 ```
 
-Because of caching it can take up to 5 seconds for Nginx to start resolving a virtual host to a new
-container IP address after a change. If that is unacceptable, use automatic configuration.
+By default, because of caching it can take up to 5 seconds for Nginx to start resolving a virtual host to a new
+container IP address after a change.
