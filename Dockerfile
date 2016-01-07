@@ -2,6 +2,12 @@ FROM tozd/nginx
 
 EXPOSE 80/tcp 443/tcp
 
+VOLUME /var/log/dnsmasq
+VOLUME /var/log/dockergen
+VOLUME /ssl
+
+ENV DOCKER_HOST unix:///var/run/docker.sock
+
 RUN apt-get update -q -q && \
  apt-get install wget ca-certificates dnsmasq --yes --force-yes && \
  mkdir /dockergen && \
