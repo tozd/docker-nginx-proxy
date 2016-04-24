@@ -72,6 +72,7 @@ server {
 {{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
     location {{ $url }} {
         proxy_pass http://{{ $host }}{{ replace $url "/" "-" -1 }}u/;
+        proxy_redirect https://{{ $host }}{{ replace $url "/" "-" -1 }}u/ /;
     }
 {{ end }}
 }
