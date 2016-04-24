@@ -1,3 +1,4 @@
 {{ range $index, $container := $ }}
-{{ $container.IP }} {{ $container.Hostname }}
+{{ $network := index $container.Networks 0 }}
+{{ $network.IP }} {{ $container.Hostname }}
 {{ end }}
