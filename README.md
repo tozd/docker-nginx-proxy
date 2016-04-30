@@ -7,7 +7,7 @@ You can use this image as it is, or you can extend it and add configuration file
 This image uses [docker-gen](https://github.com/jwilder/docker-gen) to dynamically generate Nginx configuration files
 for containers exposing HTTP virtual hosts. This works automatically even across container restarts. You configure
 virtual host by configuring environment variables on containers for which you want to provide a reverse proxy:
-* `VIRTUAL_HOST` - a comma separated list of virtual hosts provided by the container
+* `VIRTUAL_HOST` – a comma separated list of virtual hosts provided by the container
 * `VIRTUAL_URL` – a comma separated list of URL paths provided by the container
 * `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
 configure a custom port to which a reverse proxy should connect on the container
