@@ -38,7 +38,7 @@ done
 EXISTING_HOSTS="$(find /ssl -maxdepth 1 -lname 'letsencrypt*' -printf '%f\n' | rev | cut --fields=2- --delimiter '.' | rev | sort --unique)"
 
 for host in $EXISTING_HOSTS; do
-  if ! echo "${HOSTS}" | grep --quiet --line-regexp --fixed-strings "$host"; then
+  if ! echo "${HOSTS}" | grep --quiet --line-regexp --fixed-strings "${host}"; then
     rm -f "/ssl/${host}.key" "/ssl/${host}.crt"
   fi
 done
