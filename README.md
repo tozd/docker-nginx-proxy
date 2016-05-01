@@ -11,6 +11,8 @@ virtual host by configuring environment variables on containers for which you wa
 * `VIRTUAL_URL` – a comma separated list of URL paths provided by the container
 * `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
 configure a custom port to which a reverse proxy should connect on the container
+* `VIRTUAL_LETSENCRYPT` – if set, this image will automatically generate and enable a SSL key for the virtual host
+using [Let's encrypt](https://letsencrypt.org/) service, if [Let's encrypt feature is enabled](#lets-encrypt)
 
 When running a Docker image with your HTTP content, you can specify environment variables.
 
@@ -43,6 +45,16 @@ non-HTTPS traffic to HTTPS.
 If you want any extra configuration for non-HTTPS traffic, you can provide `/ssl/example.com_nonssl.conf` file which
 will be included for the non-HTTPS configuration. Similarly, for extra configuration for the HTTPS site, provide
 `/ssl/example.com_ssl.conf` file. Of course, filenames should match the hostname of your virtual host.
+
+### Let's encrypt ###
+
+If you want to enable support for automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/)
+service, and you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/), then you
+can set `LETSENCRYPT_EMAIL` environment variable to your e-mail address when running this image to enable it. From then
+on any container having `VIRTUAL_LETSENCRYPT` environment variable set will get a SSL certificate automatically
+generated and enabled, and periodically renewed.
+
+All generated keys together with Let's encrypt authentication keys are stored under `/ssl` volume.
 
 ## Dynamic resolving of containers ##
 
