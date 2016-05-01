@@ -5,6 +5,8 @@ if [[ -z "${LETSENCRYPT_EMAIL}" ]]; then
   exit 0
 fi
 
+export XDG_DATA_HOME=/letsencrypt/data
+
 mkdir -p /ssl/letsencrypt
 
 # We have to remove the last comma to make it a valid JSON.
