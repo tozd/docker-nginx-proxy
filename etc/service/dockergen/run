@@ -1,3 +1,5 @@
 #!/bin/bash -e
 
+mkdir -p /ssl/webroot
+
 exec /dockergen/docker-gen -config /dockergen/dockergen.conf 2>&1

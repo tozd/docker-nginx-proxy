@@ -37,6 +37,12 @@ upstream {{ $host }}{{ replace $url "/" "-" -1 }}u {
 server {
     server_name {{ $host }};
 
+    {{ if $.Env.LETSENCRYPT_EMAIL }}
+    location /.well-known/ {
+        root /ssl/webroot/{{ $host }};
+    }
+    {{ end }}
+
     {{ if (exists (printf "/ssl/%s_nonssl.conf" $host)) }}
     include /ssl/{{ $host }}_nonssl.conf;
     {{ end }}
@@ -67,6 +73,12 @@ server {
 
     server_name {{ $host }} *.{{ $host }};
     access_log /var/log/nginx/{{ $host }}_access.log;
+
+    {{ if $.Env.LETSENCRYPT_EMAIL }}
+    location /.well-known/ {
+        root /ssl/webroot/{{ $host }};
+    }
+    {{ end }}
 
 {{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
     location {{ $url }} {
