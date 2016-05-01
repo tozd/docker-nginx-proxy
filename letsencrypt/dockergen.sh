@@ -33,6 +33,15 @@ for host in $HOSTS; do
     exit 1
   fi
 
+  if [ -e "/ssl/${host}.key" ] && [ ! -L "/ssl/${host}.key" ]; then
+    echo "File '/ssl/${host}.key' already exists and it is not a symlink."
+    exit 1
+  fi
+  if [ -e "/ssl/${host}.crt" ] && [ ! -L "/ssl/${host}.crt" ]; then
+    echo "File '/ssl/${host}.crt' already exists and it is not a symlink."
+    exit 1
+  fi
+
   ln -f -s "letsencrypt/live/${host}/privkey.pem" "/ssl/${host}.key"
   ln -f -s "letsencrypt/live/${host}/fullchain.pem" "/ssl/${host}.crt"
 done
@@ -41,7 +50,13 @@ EXISTING_HOSTS="$(find /ssl -maxdepth 1 -lname 'letsencrypt*' -printf '%f\n' | r
 
 for host in $EXISTING_HOSTS; do
   if ! echo "${HOSTS}" | grep --quiet --line-regexp --fixed-strings "${host}"; then
-    rm -f "/ssl/${host}.key" "/ssl/${host}.crt"
+    # We make sure we are removing only symlinks.
+    if [ -L "/ssl/${host}.key" ]; then
+      rm -f "/ssl/${host}.key"
+    fi
+    if [ -L "/ssl/${host}.crt" ]; then
+      rm -f "/ssl/${host}.crt"
+    fi
   fi
 done
 
