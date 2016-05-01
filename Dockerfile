@@ -1,4 +1,4 @@
-FROM tozd/nginx
+FROM tozd/nginx-cron
 
 EXPOSE 80/tcp 443/tcp
 

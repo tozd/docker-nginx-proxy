@@ -56,6 +56,12 @@ generated and enabled, and periodically renewed.
 
 All generated keys together with Let's encrypt authentication keys are stored under `/ssl` volume.
 
+You should probably configure [`MAILTO` environment variable](https://github.com/tozd/docker-nginx-cron) to your e-mail
+address to receive reports from th daily cron job, and regularly check logs in `/var/log/letsencrypt` and
+`/var/log/dockergen` volumes to see if there are any issues with key generation and renewal.
+For e-mail sending to work you have to congigure at least [`REMOTES` environment variable](https://github.com/tozd/docker-nginx-mailer)
+as well.
+
 ## Dynamic resolving of containers ##
 
 If extending the image, you can put sites configuration files under `/etc/nginx/sites-enabled/` to add custom sites.
