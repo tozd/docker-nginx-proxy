@@ -20,8 +20,7 @@ for host in $HOSTS; do
   mkdir -p "/ssl/webroot/${host}"
 done
 
-# TODO: Remove "--test-cert" which is currently using for testing.
-/letsencrypt/letsencrypt-auto --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
+/letsencrypt/data/letsencrypt/bin/letsencrypt --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
  --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
  --webroot-map "${LIST_JSON}"
 
