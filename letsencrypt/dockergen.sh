@@ -14,6 +14,8 @@ LIST_JSON="$(cat /ssl/webroot/list.json | sed -n 'x;${s/,$//;p;x}; 2,$ p')"
 # List of hosts in the JSON file.
 HOSTS="$(echo "${LIST_JSON}" | jq --raw-output 'keys | .[]')"
 
+# Make sure HTTP server can access webroot even if /ssl is otherwise closed.
+chmod +001 /ssl /ssl/webroot
 for host in $HOSTS; do
   mkdir -p "/ssl/webroot/${host}"
 done
