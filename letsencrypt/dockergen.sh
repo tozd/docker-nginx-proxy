@@ -26,12 +26,12 @@ done
  --webroot-map "${LIST_JSON}"
 
 for host in $HOSTS; do
-  if [ ! -e "letsencrypt/live/${host}/privkey.pem" ]; then
-    echo "File 'letsencrypt/live/${host}/privkey.pem' is missing."
+  if [ ! -e "/ssl/letsencrypt/live/${host}/privkey.pem" ]; then
+    echo "File '/ssl/letsencrypt/live/${host}/privkey.pem' is missing."
     exit 1
   fi
-  if [ ! -e "letsencrypt/live/${host}/fullchain.pem" ]; then
-    echo "File 'letsencrypt/live/${host}/fullchain.pem' is missing."
+  if [ ! -e "/ssl/letsencrypt/live/${host}/fullchain.pem" ]; then
+    echo "File '/ssl/letsencrypt/live/${host}/fullchain.pem' is missing."
     exit 1
   fi
 
