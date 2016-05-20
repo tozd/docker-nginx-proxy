@@ -9,22 +9,18 @@ export XDG_DATA_HOME=/letsencrypt/data
 
 mkdir -p /ssl/letsencrypt
 
-# We have to remove the last comma to make it a valid JSON.
-LIST_JSON="$(cat /ssl/webroot/list.json | sed -n 'x;${s/,$//;p;x}; 2,$ p')"
-# List of hosts in the JSON file.
-HOSTS="$(echo "${LIST_JSON}" | jq --raw-output 'keys | .[]')"
+# List of hosts with Let's encrypt enabled.
+HOSTS="$(cat /ssl/letsencrypt.list)"
 
 # Make sure HTTP server can access webroot even if /ssl is otherwise closed.
 chmod +001 /ssl /ssl/webroot
 for host in $HOSTS; do
   mkdir -p "/ssl/webroot/${host}"
-done
 
-/letsencrypt/data/letsencrypt/bin/letsencrypt --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
- --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
- --webroot-map "${LIST_JSON}"
+  /letsencrypt/data/letsencrypt/bin/letsencrypt --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
+   --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
+   --webroot-path "/ssl/webroot/${host}" --domain "${host}"
 
-for host in $HOSTS; do
   if [ ! -e "/ssl/letsencrypt/live/${host}/privkey.pem" ]; then
     echo "File '/ssl/letsencrypt/live/${host}/privkey.pem' is missing."
     exit 1

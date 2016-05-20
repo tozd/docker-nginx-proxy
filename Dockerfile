@@ -11,7 +11,7 @@ ENV DOCKER_HOST unix:///var/run/docker.sock
 ENV LETSENCRYPT_EMAIL=
 
 RUN apt-get update -q -q && \
- apt-get install wget ca-certificates dnsmasq jq --yes --force-yes && \
+ apt-get install wget ca-certificates dnsmasq --yes --force-yes && \
  mkdir /dockergen && \
  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.5.0/docker-gen-linux-amd64-0.5.0.tar.gz && \
  tar xf /dockergen/docker-gen-linux-amd64-0.5.0.tar.gz -C /dockergen && \

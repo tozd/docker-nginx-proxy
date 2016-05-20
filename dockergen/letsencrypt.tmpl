@@ -1,9 +1,7 @@
-{
 {{ range $host, $containersByHost := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 {{ with $containers := whereExist $containersByHost "Env.VIRTUAL_LETSENCRYPT" }}
 {{ if len $containers }}
-  "{{ js $host }}": "/ssl/webroot/{{ js $host }}/",
+{{ $host }}
 {{ end }}
 {{ end }}
 {{ end }}
-}
