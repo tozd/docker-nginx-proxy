@@ -8,7 +8,10 @@ This image uses [docker-gen](https://github.com/jwilder/docker-gen) to dynamical
 for containers exposing HTTP virtual hosts. This works automatically even across container restarts. You configure
 virtual host by configuring environment variables on containers for which you want to provide a reverse proxy:
 * `VIRTUAL_HOST` – a comma separated list of virtual hosts provided by the container
-* `VIRTUAL_URL` – a comma separated list of URL paths provided by the container
+* `VIRTUAL_URL` – a comma separated list of URL paths provided by the container; they will be mapped to the HTTP
+root (`/`) of the container
+* `VIRTUAL_ALIAS` – a comma separated list of URL paths provided by the container, they will be mapped to the same
+HTTP path of the container
 * `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
 configure a custom port to which a reverse proxy should connect on the container
 * `VIRTUAL_LETSENCRYPT` – if set, this image will automatically generate and enable a SSL key for the virtual host
@@ -31,6 +34,14 @@ docker run --name example2 ... --env VIRTUAL_HOST=example.com --env VIRTUAL_URL=
 ```
 
 Multiple containers can provide content for the same host and URL paths – Nginx will balance load across all of them.
+
+A difference between `VIRTUAL_URL` and `VIRTUAL_ALIAS` is that `VIRTUAL_URL` maps all outside paths to the internal HTTP root
+(`/`) of the container. This is useful when your container provides static content under the root and you want to
+expose it elsewhere to the outside. But the downside is that the internal references between resources, if a container
+assumes content is under `/`, might not work correctly. For example, a HTML tag `<img src="/foobar.png" />`, which
+would from the perspective of the container, from the outside might resolve to something completely else, or not resolve
+at all. This is why it is often better to serve content in containers under the same path as outside, and use
+`VIRTUAL_ALIAS` to map them 1:1. But this means that the container has to be configured accordingly as well.
 
 ### HTTPS ###
 

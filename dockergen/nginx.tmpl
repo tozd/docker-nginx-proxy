@@ -33,6 +33,37 @@ upstream {{ $host }}{{ replace $url "/" "-" -1 }}u {
 }
 {{ end }}
 
+{{ range $alias, $containers := groupByMulti $containersByHost "Env.VIRTUAL_ALIAS" "," }}
+upstream {{ $host }}{{ replace $alias "/" "-" -1 }}a {
+    {{ range $index, $value := $containers }}
+        {{ $addrLen := len $value.Addresses }}
+        {{/* If only 1 port exposed, use that */}}
+        {{ if eq $addrLen 1 }}
+            {{ with $address := index $value.Addresses 0 }}
+               # {{$value.Name}}
+               server {{ $address.IP }}:{{ $address.Port }};
+            {{ end }}
+        {{/* If more than one port exposed, use the one matching VIRTUAL_PORT env var */}}
+        {{ else if $value.Env.VIRTUAL_PORT }}
+            {{ range $i, $address := $value.Addresses }}
+               {{ if eq $address.Port $value.Env.VIRTUAL_PORT }}
+               # {{$value.Name}}
+               server {{ $address.IP }}:{{ $address.Port }};
+               {{ end }}
+            {{ end }}
+        {{/* Else default to standard web port 80 */}}
+        {{ else }}
+            {{ range $i, $address := $value.Addresses }}
+                {{ if eq $address.Port "80" }}
+                # {{$value.Name}}
+                server {{ $address.IP }}:{{ $address.Port }};
+                {{ end }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+}
+{{ end }}
+
 {{ if (and (exists (printf "/ssl/%s.crt" $host)) (exists (printf "/ssl/%s.key" $host))) }}
 server {
     server_name {{ $host }};
@@ -82,7 +113,20 @@ server {
 
 {{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
     location {{ $url }} {
+        # / at the end of the proxy_pass means that all requests to this
+        # location are proxied to the root of the container.
         proxy_pass http://{{ $host }}{{ replace $url "/" "-" -1 }}u/;
+        # Making sure Location always has external scheme.
+        proxy_redirect http://{{ $host }}/ /;
+        proxy_redirect https://{{ $host }}/ /;
+    }
+{{ end }}
+
+{{ range $alias, $containers := groupByMulti $containersByHost "Env.VIRTUAL_ALIAS" "," }}
+    location {{ $alias }} {
+        # No / at the end of the proxy_pass means that all requests to this
+        # location are proxied to the same location of the container.
+        proxy_pass http://{{ $host }}{{ replace $alias "/" "-" -1 }}a;
         # Making sure Location always has external scheme.
         proxy_redirect http://{{ $host }}/ /;
         proxy_redirect https://{{ $host }}/ /;
