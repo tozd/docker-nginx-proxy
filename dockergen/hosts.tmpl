@@ -1,7 +1,7 @@
 {{ range $index, $container := $ }}
 {{ if $container.Networks }}
 {{ $network := index $container.Networks 0 }}
-{{ $network.IP }} {{ $container.Hostname }}
+{{ $network.IP }} {{ $container.Hostname }} {{ $container.Hostname }}.{{ $network.Name }}
 {{ else }}
 {{ $container.IP }} {{ $container.Hostname }}
 {{ end }}
