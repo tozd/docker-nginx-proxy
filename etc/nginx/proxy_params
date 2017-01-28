@@ -1,9 +1,3 @@
 proxy_set_header Host $http_host;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $scheme;
-# Hack for proper handling of multiline certificates.
-# Variables are defined in conf.d/before_proxy.conf.
-# See: http://forum.nginx.org/read.php?2,236546,236596
-# See: https://trac.nginx.org/nginx/ticket/857
-proxy_set_header X-SSL-Certificate $a$b$c$d$e$f$g$h$i$j$k$l$m$n$o$p$q$r$s$t$v$u$w$x$y$z;
+
+include proxy_params_without_host;
