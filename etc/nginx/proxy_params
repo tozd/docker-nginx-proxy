@@ -1,12 +1,9 @@
-# Hack for proper handling of multiline certificates.
-# See: http://forum.nginx.org/read.php?2,236546,236596
-# See: https://trac.nginx.org/nginx/ticket/857
-map $ssl_client_raw_cert $a {
-  "~^(-.*-\n)(?<1st>[^\n]+)\n((?<b>[^\n]+)\n)?((?<c>[^\n]+)\n)?((?<d>[^\n]+)\n)?((?<e>[^\n]+)\n)?((?<f>[^\n]+)\n)?((?<g>[^\n]+)\n)?((?<h>[^\n]+)\n)?((?<i>[^\n]+)\n)?((?<j>[^\n]+)\n)?((?<k>[^\n]+)\n)?((?<l>[^\n]+)\n)?((?<m>[^\n]+)\n)?((?<n>[^\n]+)\n)?((?<o>[^\n]+)\n)?((?<p>[^\n]+)\n)?((?<q>[^\n]+)\n)?((?<r>[^\n]+)\n)?((?<s>[^\n]+)\n)?((?<t>[^\n]+)\n)?((?<v>[^\n]+)\n)?((?<u>[^\n]+)\n)?((?<w>[^\n]+)\n)?((?<x>[^\n]+)\n)?((?<y>[^\n]+)\n)?((?<z>[^\n]+)\n)?(-.*-)$" $1st;
-}
-
 proxy_set_header Host $http_host;
 proxy_set_header X-Real-IP $remote_addr;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
+# Hack for proper handling of multiline certificates.
+# Variables are defined in conf.d/before_proxy.conf.
+# See: http://forum.nginx.org/read.php?2,236546,236596
+# See: https://trac.nginx.org/nginx/ticket/857
 proxy_set_header X-SSL-Certificate $a$b$c$d$e$f$g$h$i$j$k$l$m$n$o$p$q$r$s$t$v$u$w$x$y$z;
