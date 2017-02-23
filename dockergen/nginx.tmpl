@@ -125,8 +125,8 @@ server {
     server_name {{ $host }};
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
-    location /.well-known/ {
-        root /ssl/webroot/{{ $host }};
+    location /.well-known/acme-challenge/ {
+        root /ssl/webroot/{{ $host }}/acme-challenge;
     }
     {{ end }}
 
@@ -162,8 +162,8 @@ server {
     access_log /var/log/nginx/{{ $host }}_access.log;
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
-    location /.well-known/ {
-        root /ssl/webroot/{{ $host }};
+    location /.well-known/acme-challenge/ {
+        root /ssl/webroot/{{ $host }}/acme-challenge;
     }
     {{ end }}
 
