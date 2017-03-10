@@ -126,7 +126,7 @@ server {
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
     location /.well-known/acme-challenge/ {
-        root /ssl/webroot/{{ $host }}/acme-challenge;
+        root /ssl/webroot/{{ $host }};
     }
     {{ end }}
 
@@ -163,7 +163,7 @@ server {
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
     location /.well-known/acme-challenge/ {
-        root /ssl/webroot/{{ $host }}/acme-challenge;
+        root /ssl/webroot/{{ $host }};
     }
     {{ end }}
 
