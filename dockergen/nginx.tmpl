@@ -7,7 +7,8 @@ upstream {{ $host }}{{ replace $url "/" "-" -1 }}u {
     {{ range $index, $value := $containers }}
         {{ $addrLen := len $value.Addresses }}
         {{ if $value.Networks }}
-            {{ $network := index $value.Networks 0 }}
+            {{ $network := first (where $value.Networks "Name" $value.Env.VIRTUAL_NETWORK) }}
+            {{ $network := when (not $network) (first $value.Networks) $network }}
             {{/* If only 1 port exposed, use that */}}
             {{ if eq $addrLen 1 }}
                 {{ with $address := index $value.Addresses 0 }}
@@ -66,7 +67,8 @@ upstream {{ $host }}{{ replace $alias "/" "-" -1 }}a {
     {{ range $index, $value := $containers }}
         {{ $addrLen := len $value.Addresses }}
         {{ if $value.Networks }}
-            {{ $network := index $value.Networks 0 }}
+            {{ $network := first (where $value.Networks "Name" $value.Env.VIRTUAL_NETWORK) }}
+            {{ $network := when (not $network) (first $value.Networks) $network }}
             {{/* If only 1 port exposed, use that */}}
             {{ if eq $addrLen 1 }}
                 {{ with $address := index $value.Addresses 0 }}

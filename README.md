@@ -14,6 +14,8 @@ root (`/`) of the container
 HTTP path of the container
 * `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
 configure a custom port to which a reverse proxy should connect on the container
+* `VIRTUAL_NETWORK` – if container is connected to more than one network, this variable can be used to select which
+network should be used (by default, the first network is used, but the order is not guaranteed)
 * `VIRTUAL_LETSENCRYPT` – if set, this image will automatically generate and enable a SSL key for the virtual host
 using [Let's encrypt](https://letsencrypt.org/) service, if [Let's encrypt feature is enabled](#lets-encrypt)
 
