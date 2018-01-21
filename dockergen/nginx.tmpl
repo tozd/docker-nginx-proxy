@@ -160,7 +160,7 @@ server {
     listen 80;
 {{ end }}
 
-    server_name {{ $host }} *.{{ $host }};
+    server_name {{ $host }};
     access_log /var/log/nginx/{{ $host }}_access.log;
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
