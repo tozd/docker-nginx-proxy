@@ -155,12 +155,15 @@ server {
     {{ end }}
 
     add_header Strict-Transport-Security "max-age=31536000";
+
+    server_name {{ $host }};
 {{ else }}
 server {
     listen 80;
+
+    server_name {{ $host }} *.{{ $host }};
 {{ end }}
 
-    server_name {{ $host }};
     access_log /var/log/nginx/{{ $host }}_access.log;
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
