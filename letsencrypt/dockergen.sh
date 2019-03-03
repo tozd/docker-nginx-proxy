@@ -17,9 +17,11 @@ chmod +001 /ssl /ssl/webroot
 for host in $HOSTS; do
   mkdir -p "/ssl/webroot/${host}"
 
-  /letsencrypt/data/letsencrypt/bin/letsencrypt --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
+  if ! /letsencrypt/data/letsencrypt/bin/letsencrypt --no-self-upgrade --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
    --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
-   --webroot-path "/ssl/webroot/${host}" --domain "${host}"
+   --webroot-path "/ssl/webroot/${host}" --domain "${host}" ; then
+    echo "Renewing '$host' failed."
+  fi
 
   if [ ! -e "/ssl/letsencrypt/live/${host}/privkey.pem" ]; then
     echo "File '/ssl/letsencrypt/live/${host}/privkey.pem' is missing."
