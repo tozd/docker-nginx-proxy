@@ -22,7 +22,8 @@ RUN apt-get update -q -q && \
  rm -f /letsencrypt/v0.5.0.tar.gz && \
  cd /letsencrypt && \
  mkdir -p /ssl/letsencrypt && \
- ./letsencrypt-auto --no-self-upgrade --noninteractive --config-dir /ssl/letsencrypt --help
+ ./letsencrypt-auto --no-self-upgrade --noninteractive --config-dir /ssl/letsencrypt --help && \
+ apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm
 
 COPY ./etc /etc
 COPY ./dockergen /dockergen
