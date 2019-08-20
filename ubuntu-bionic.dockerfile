@@ -1,4 +1,4 @@
-FROM tozd/nginx-cron:ubuntu-xenial
+FROM tozd/nginx-cron:ubuntu-bionic
 
 EXPOSE 80/tcp 443/tcp
 
