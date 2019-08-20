@@ -11,20 +11,17 @@ ENV DOCKER_HOST unix:///var/run/docker.sock
 ENV LETSENCRYPT_EMAIL=
 
 RUN apt-get update -q -q && \
- apt-get install wget ca-certificates dnsmasq --yes --force-yes && \
+ apt-get --yes --force-yes install software-properties-common && \
+ add-apt-repository --yes universe && \
+ add-apt-repository --yes ppa:certbot/certbot && \
+ apt-get  --yes --force-yes install certbot wget ca-certificates dnsmasq && \
+ rm -f /etc/cron.d/certbot && \
  mkdir /dockergen && \
- wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.7.3/docker-gen-linux-amd64-0.7.3.tar.gz && \
- tar xf /dockergen/docker-gen-linux-amd64-0.7.3.tar.gz -C /dockergen && \
- mkdir /letsencrypt && \
- export XDG_DATA_HOME=/letsencrypt/data && \
- wget -P /letsencrypt https://github.com/letsencrypt/letsencrypt/archive/v0.5.0.tar.gz && \
- tar xf /letsencrypt/v0.5.0.tar.gz -C /letsencrypt --strip-components=1 && \
- rm -f /letsencrypt/v0.5.0.tar.gz && \
- cd /letsencrypt && \
+ wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.7.4/docker-gen-linux-amd64-0.7.4.tar.gz && \
+ tar xf /dockergen/docker-gen-linux-amd64-0.7.4.tar.gz -C /dockergen && \
  mkdir -p /ssl/letsencrypt && \
- ./letsencrypt-auto --no-self-upgrade --noninteractive --config-dir /ssl/letsencrypt --help && \
  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm
 
 COPY ./etc /etc
 COPY ./dockergen /dockergen
-COPY ./letsencrypt /letsencrypt
+COPY ./letsencrypt-bionic /letsencrypt

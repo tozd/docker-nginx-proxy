@@ -27,4 +27,4 @@ RUN apt-get update -q -q && \
 
 COPY ./etc /etc
 COPY ./dockergen /dockergen
-COPY ./letsencrypt /letsencrypt
+COPY ./letsencrypt-xenial /letsencrypt
