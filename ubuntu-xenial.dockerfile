@@ -15,6 +15,7 @@ RUN apt-get update -q -q && \
  mkdir /dockergen && \
  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.7.3/docker-gen-linux-amd64-0.7.3.tar.gz && \
  tar xf /dockergen/docker-gen-linux-amd64-0.7.3.tar.gz -C /dockergen && \
+ rm -f /dockergen/docker-gen-linux-amd64-0.7.3.tar.gz && \
  mkdir /letsencrypt && \
  export XDG_DATA_HOME=/letsencrypt/data && \
  wget -P /letsencrypt https://github.com/letsencrypt/letsencrypt/archive/v0.5.0.tar.gz && \
