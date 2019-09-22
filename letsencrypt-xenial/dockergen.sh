@@ -8,9 +8,10 @@ fi
 export XDG_DATA_HOME=/letsencrypt/data
 
 mkdir -p /ssl/letsencrypt
+touch /ssl/letsencrypt.manual.list
 
 # List of hosts with Let's encrypt enabled.
-HOSTS="$(cat /ssl/letsencrypt.list)"
+HOSTS="$(cat /ssl/letsencrypt.list /ssl/letsencrypt.manual.list)"
 
 # Make sure HTTP server can access webroot even if /ssl is otherwise closed.
 chmod +001 /ssl /ssl/webroot
