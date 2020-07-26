@@ -14,7 +14,7 @@ RUN apt-get update -q -q && \
  apt-get --yes --force-yes install software-properties-common && \
  add-apt-repository --yes universe && \
  add-apt-repository --yes ppa:certbot/certbot && \
- apt-get  --yes --force-yes install certbot wget ca-certificates dnsmasq && \
+ apt-get --yes --force-yes install certbot wget ca-certificates dnsmasq && \
  rm -f /etc/cron.d/certbot && \
  mkdir /dockergen && \
  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.7.4/docker-gen-linux-amd64-0.7.4.tar.gz && \
@@ -25,4 +25,4 @@ RUN apt-get update -q -q && \
 
 COPY ./etc /etc
 COPY ./dockergen /dockergen
-COPY ./letsencrypt-bionic /letsencrypt
+COPY ./letsencrypt /letsencrypt

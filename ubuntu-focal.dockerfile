@@ -25,4 +25,4 @@ RUN apt-get update -q -q && \
 
 COPY ./etc /etc
 COPY ./dockergen /dockergen
-COPY ./letsencrypt-bionic /letsencrypt
+COPY ./letsencrypt /letsencrypt
