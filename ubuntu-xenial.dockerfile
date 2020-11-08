@@ -1,4 +1,4 @@
-FROM tozd/nginx-cron:ubuntu-xenial
+FROM registry.gitlab.com/tozd/docker/nginx-cron:ubuntu-xenial
 
 EXPOSE 80/tcp 443/tcp
 

@@ -1,4 +1,4 @@
-FROM tozd/nginx-cron:ubuntu-focal
+FROM registry.gitlab.com/tozd/docker/nginx-cron:ubuntu-focal
 
 EXPOSE 80/tcp 443/tcp
 

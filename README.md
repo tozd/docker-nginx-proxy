@@ -1,6 +1,13 @@
-# tozd/nginx-proxy
+# tozd/base
 
 <https://gitlab.com/tozd/docker/nginx-proxy>
+
+Available as:
+
+* [`tozd/nginx-proxy`](https://hub.docker.com/r/tozd/nginx-proxy)
+* [`registry.gitlab.com/tozd/docker/nginx-proxy`](https://gitlab.com/tozd/docker/nginx-proxy/container_registry)
+
+## Description
 
 Image providing a reverse-proxy using [Nginx](http://nginx.org) HTTP server with support for HTTPS virtual hosts.
 

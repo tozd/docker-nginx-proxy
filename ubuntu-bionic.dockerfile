@@ -1,4 +1,4 @@
-FROM tozd/nginx-cron:ubuntu-bionic
+FROM registry.gitlab.com/tozd/docker/nginx-cron:ubuntu-bionic
 
 EXPOSE 80/tcp 443/tcp
 
