@@ -1,4 +1,4 @@
-# tozd/base
+# tozd/nginx-proxy
 
 <https://gitlab.com/tozd/docker/nginx-proxy>
 
