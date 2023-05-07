@@ -7,6 +7,29 @@ Available as:
 - [`tozd/nginx-proxy`](https://hub.docker.com/r/tozd/nginx-proxy)
 - [`registry.gitlab.com/tozd/docker/nginx-proxy`](https://gitlab.com/tozd/docker/nginx-proxy/container_registry)
 
+## Image inheritance
+
+[`tozd/base`](https://gitlab.com/tozd/docker/base) ← [`tozd/runit`](https://gitlab.com/tozd/docker/runit) ← [`tozd/nginx`](https://gitlab.com/tozd/docker/nginx) ← [`tozd/nginx-mailer`](https://gitlab.com/tozd/docker/nginx-mailer) ← [`tozd/nginx-cron`](https://gitlab.com/tozd/docker/nginx-cron) ← `tozd/nginx-proxy`
+
+## Tags
+
+- `ubuntu-xenial`
+- `ubuntu-bionic`
+- `ubuntu-focal`
+- `ubuntu-jammy`
+
+## Volumes
+
+- `/var/log/dnsmasq`: Log files for an internal lightweight DNS resolver when one is not provided by Docker.
+- `/var/log/dockergen`: Log files for docker-gen.
+- `/var/log/letsencrypt`: Log files for Let's encrypt service.
+- `/ssl`: All generated keys together with Let's encrypt authentication keys. Persist this volume to not lose state.
+
+## Variables
+
+- `DOCKER_HOST`: Where to connect to access Docker daemon to monitor for new containers. Default is `/var/run/docker.sock` inside the container.
+- `LETSENCRYPT_EMAIL`: If set, enables automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/) service. By setting it you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/).
+
 ## Description
 
 Image providing a reverse-proxy using [Nginx](http://nginx.org) HTTP server with support for HTTPS virtual hosts.
@@ -87,6 +110,8 @@ address to receive reports from th daily cron job, and regularly check logs in `
 For e-mail sending to work you have to configure at least [`REMOTES` environment variable](https://gitlab.com/tozd/docker/nginx-mailer)
 as well.
 
+You can list in `/ssl/letsencrypt.manual.list` file additional domains you want the container to obtain SSL keys.
+
 ## Dynamic resolving of containers
 
 If extending the image, you can put sites configuration files under `/etc/nginx/sites-enabled/` to add custom sites.
@@ -123,3 +148,8 @@ docker run --name example --hostname example ...
 
 By default, because of caching it can take up to 5 seconds for Nginx to start resolving a virtual host to a new
 container IP address after a change.
+
+## GitHub mirror
+
+There is also a [read-only GitHub mirror available](https://github.com/tozd/docker-nginx-proxy),
+if you need to fork the project there.
