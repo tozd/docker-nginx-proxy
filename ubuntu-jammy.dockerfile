@@ -1,6 +1,6 @@
 FROM registry.gitlab.com/tozd/docker/nginx-cron:ubuntu-jammy
 
-EXPOSE 80/tcp 443/tcp
+EXPOSE 443/tcp
 
 VOLUME /var/log/dnsmasq
 VOLUME /var/log/dockergen
