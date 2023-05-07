@@ -4,8 +4,8 @@
 
 Available as:
 
-* [`tozd/nginx-proxy`](https://hub.docker.com/r/tozd/nginx-proxy)
-* [`registry.gitlab.com/tozd/docker/nginx-proxy`](https://gitlab.com/tozd/docker/nginx-proxy/container_registry)
+- [`tozd/nginx-proxy`](https://hub.docker.com/r/tozd/nginx-proxy)
+- [`registry.gitlab.com/tozd/docker/nginx-proxy`](https://gitlab.com/tozd/docker/nginx-proxy/container_registry)
 
 ## Description
 
@@ -13,22 +13,23 @@ Image providing a reverse-proxy using [Nginx](http://nginx.org) HTTP server with
 
 You can use this image as it is, or you can extend it and add configuration files for your virtual hosts.
 
-## Automatic configuration ##
+## Automatic configuration
 
 This image uses [docker-gen](https://github.com/jwilder/docker-gen) to dynamically generate Nginx configuration files
 for containers exposing HTTP virtual hosts. This works automatically even across container restarts. You configure
 virtual host by configuring environment variables on containers for which you want to provide a reverse proxy:
-* `VIRTUAL_HOST` – a comma separated list of virtual hosts provided by the container
-* `VIRTUAL_URL` – a comma separated list of URL paths provided by the container; they will be mapped to the HTTP
-root (`/`) of the container
-* `VIRTUAL_ALIAS` – a comma separated list of URL paths provided by the container, they will be mapped to the same
-HTTP path of the container
-* `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
-configure a custom port to which a reverse proxy should connect on the container
-* `VIRTUAL_NETWORK` – if container is connected to more than one network, this variable can be used to select which
-network should be used (by default, the first network is used, but the order is not guaranteed)
-* `VIRTUAL_LETSENCRYPT` – if set, this image will automatically generate and enable a SSL key for the virtual host
-using [Let's encrypt](https://letsencrypt.org/) service, if [Let's encrypt feature is enabled](#lets-encrypt)
+
+- `VIRTUAL_HOST` – a comma separated list of virtual hosts provided by the container
+- `VIRTUAL_URL` – a comma separated list of URL paths provided by the container; they will be mapped to the HTTP
+  root (`/`) of the container
+- `VIRTUAL_ALIAS` – a comma separated list of URL paths provided by the container, they will be mapped to the same
+  HTTP path of the container
+- `VIRTUAL_PORT` – if container exposes more than one port, or you do not want to use the default port `80`, you can
+  configure a custom port to which a reverse proxy should connect on the container
+- `VIRTUAL_NETWORK` – if container is connected to more than one network, this variable can be used to select which
+  network should be used (by default, the first network is used, but the order is not guaranteed)
+- `VIRTUAL_LETSENCRYPT` – if set, this image will automatically generate and enable a SSL key for the virtual host
+  using [Let's encrypt](https://letsencrypt.org/) service, if [Let's encrypt feature is enabled](#lets-encrypt)
 
 When running a Docker image with your HTTP content, you can specify environment variables.
 
@@ -56,7 +57,7 @@ would from the perspective of the container, from the outside might resolve to s
 at all. This is why it is often better to serve content in containers under the same path as outside, and use
 `VIRTUAL_ALIAS` to map them 1:1. But this means that the container has to be configured accordingly as well.
 
-### HTTPS ###
+### HTTPS
 
 If you want to use HTTPS for a virtual host, you should mount a `/ssl` volume into the container and provide
 SSL key for a virtual host.
@@ -70,7 +71,7 @@ If you want any extra configuration for non-HTTPS traffic, you can provide `/ssl
 will be included for the non-HTTPS configuration. Similarly, for extra configuration for the HTTPS site, provide
 `/ssl/example.com_ssl.conf` file. Of course, filenames should match the hostname of your virtual host.
 
-### Let's encrypt ###
+### Let's encrypt
 
 If you want to enable support for automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/)
 service, and you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/), then you
@@ -86,7 +87,7 @@ address to receive reports from th daily cron job, and regularly check logs in `
 For e-mail sending to work you have to configure at least [`REMOTES` environment variable](https://gitlab.com/tozd/docker/nginx-mailer)
 as well.
 
-## Dynamic resolving of containers ##
+## Dynamic resolving of containers
 
 If extending the image, you can put sites configuration files under `/etc/nginx/sites-enabled/` to add custom sites.
 
