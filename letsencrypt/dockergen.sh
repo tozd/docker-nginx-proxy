@@ -18,7 +18,7 @@ for host in $HOSTS; do
 
   if ! certbot --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
    --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
-   --webroot-path "/ssl/webroot/${host}" --domain "${host}" ; then
+   --webroot-path "/ssl/webroot/${host}" --domain "${host}" ${LETSENCRYPT_ARGS} ; then
     echo "Renewing '$host' failed."
   fi
 

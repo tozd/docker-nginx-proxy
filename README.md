@@ -29,6 +29,7 @@ Available as:
 
 - `DOCKER_HOST`: Where to connect to access Docker daemon to monitor for new containers. Default is `/var/run/docker.sock` inside the container.
 - `LETSENCRYPT_EMAIL`: If set, enables automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/) service. By setting it you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/).
+- `LETSENCRYPT_ARGS`: Any additional arguments you might want to pass to Let's encrypt's certbot.
 
 ## Description
 
