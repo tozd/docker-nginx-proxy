@@ -94,9 +94,9 @@ If extending the image, you can put sites configuration files under `/etc/nginx/
 Alternatively, you can mount a volume into `/etc/nginx/sites-volume/` directory and provide sites there.
 
 To support static configuration files for containers which have dynamic IP addresses, this image configures
-Nginx with an internal lightweight DNS resolver which dynamically resolves container hostnames into IPs
-([when not provided by Docker](https://docs.docker.com/engine/userguide/networking/configure-dns/). Here
-is an example of site configuration using DNS resolving:
+([when not provided by Docker](https://docs.docker.com/engine/userguide/networking/configure-dns/))
+Nginx with an internal lightweight DNS resolver which dynamically resolves container hostnames into IPs.
+Here is an example of site configuration using DNS resolving:
 
 ```
 server {
