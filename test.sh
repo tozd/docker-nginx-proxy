@@ -70,11 +70,7 @@ docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VI
 cleanup_app=1
 
 echo "Sleeping"
-sleep 5
-
-docker logs pebble
-docker exec proxy ps aux
-docker exec test ps aux
+sleep 20
 
 echo "Testing"
 ADDRESS="$(getent hosts docker | awk '{print $1}')"
