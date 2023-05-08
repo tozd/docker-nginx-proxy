@@ -77,3 +77,27 @@ ADDRESS="$(getent hosts docker | awk '{print $1}')"
 echo "$ADDRESS site.test" >> /etc/hosts
 wget --no-check-certificate -T 30 -q -O - https://docker:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
 wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
+
+echo "Reconfiguring app Docker image"
+docker stop test
+cleanup_app=0
+docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_URL=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
+cleanup_app=1
+
+echo "Sleeping"
+sleep 20
+
+echo "Testing"
+wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
+
+echo "Reconfiguring app Docker image"
+docker stop test
+cleanup_app=0
+docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
+cleanup_app=1
+
+echo "Sleeping"
+sleep 20
+
+echo "Testing"
+wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Foo site</title>'
