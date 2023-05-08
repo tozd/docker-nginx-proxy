@@ -72,6 +72,10 @@ cleanup_app=1
 echo "Sleeping"
 sleep 5
 
+docker logs pebble
+docker ps proxy
+docker ps test
+
 echo "Testing"
 ADDRESS="$(getent hosts docker | awk '{print $1}')"
 echo "$ADDRESS site.test" >> /etc/hosts
