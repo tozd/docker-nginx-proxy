@@ -73,8 +73,8 @@ echo "Sleeping"
 sleep 5
 
 docker logs pebble
-docker ps proxy
-docker ps test
+docker exec -t -i proxy ps aux
+docker exec -t -i test ps aux
 
 echo "Testing"
 ADDRESS="$(getent hosts docker | awk '{print $1}')"
