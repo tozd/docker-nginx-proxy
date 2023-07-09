@@ -26,12 +26,12 @@ cleanup() {
 
   if [ "$cleanup_app_image" -ne 0 ]; then
     echo "Removing app Docker image"
-    docker image rm testimage
+    docker image rm -f testimage
   fi
 
   if [ "$cleanup_pebble_image" -ne 0 ]; then
     echo "Removing Pebble Docker image"
-    docker image rm pebbleimage
+    docker image rm -f pebbleimage
   fi
 
   if [ "$cleanup_network" -ne 0 ]; then
