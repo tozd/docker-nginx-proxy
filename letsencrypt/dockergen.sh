@@ -63,4 +63,4 @@ done
 pkill -HUP -P 1 dockergen || true
 
 # We reload nginx always because content of files where links are pointing might changed.
-/usr/sbin/nginx -s reload || true
+/usr/sbin/nginx -s reload 2>/dev/null || true
