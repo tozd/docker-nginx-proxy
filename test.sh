@@ -9,30 +9,32 @@ cleanup_app_image=0
 cleanup_pebble_image=0
 cleanup_network=0
 cleanup() {
+  set +e
+
   if [ "$cleanup_app" -ne 0 ]; then
     echo "Logs app"
-    docker logs test || true
+    docker logs test
 
     echo "Stopping app Docker image"
-    docker stop test || true
+    docker stop test
     docker rm -f test
   fi
 
   if [ "$cleanup_proxy" -ne 0 ]; then
     echo "Logs proxy"
-    docker logs proxy || true
+    docker logs proxy
 
     echo "Stopping proxy Docker image"
-    docker stop proxy || true
+    docker stop proxy
     docker rm -f proxy
   fi
 
   if [ "$cleanup_pebble" -ne 0 ]; then
     echo "Logs pebble"
-    docker logs pebble || true
+    docker logs pebble
 
     echo "Stopping Pebble Docker image"
-    docker stop pebble || true
+    docker stop pebble
     docker rm -f pebble
   fi
 
@@ -91,7 +93,7 @@ wget --no-check-certificate -T 30 -q -O - https://docker:15000/roots/0 >> /etc/s
 wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
-docker stop test || true
+docker stop test
 sleep 1
 docker rm -f test
 cleanup_app=0
@@ -106,7 +108,7 @@ echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
-docker stop test || true
+docker stop test
 sleep 1
 docker rm -f test
 cleanup_app=0
