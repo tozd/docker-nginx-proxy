@@ -91,7 +91,8 @@ wget --no-check-certificate -T 30 -q -O - https://docker:15000/roots/0 >> /etc/s
 wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
-docker stop test
+docker stop test || true
+docker rm -f test
 cleanup_app=0
 sleep 1
 docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_URL=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
@@ -104,7 +105,8 @@ echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
-docker stop test
+docker stop test || true
+docker rm -f test
 cleanup_app=0
 sleep 1
 docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
