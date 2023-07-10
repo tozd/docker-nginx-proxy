@@ -4,6 +4,8 @@ mkdir -p /ssl/webroot
 
 # Depend on the nginx service to be up (so that Let's encrypt can potentially
 # immediately create some keys for which it needs a running HTTP server).
-sv start nginx || exit 1
+while ! pgrep -P 1 nginx >/dev/null ; do
+  sleep 1
+done
 
 exec /dockergen/docker-gen -config /dockergen/dockergen.conf 2>&1

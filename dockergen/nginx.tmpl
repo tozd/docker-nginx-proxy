@@ -164,7 +164,11 @@ server {
     server_name {{ $host }} *.{{ $host }};
 {{ end }}
 
-    access_log /var/log/nginx/{{ $host }}_access.log;
+    {{ if eq $.Env.LOG_TO_STDOUT "1" }}
+    access_log /dev/stdout json;
+    {{ else }}
+    access_log /var/log/nginx/{{ $host }}_access.log json;
+    {{ end }}
 
     {{ if $.Env.LETSENCRYPT_EMAIL }}
     location /.well-known/acme-challenge/ {

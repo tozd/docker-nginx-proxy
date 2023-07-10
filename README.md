@@ -9,7 +9,7 @@ Available as:
 
 ## Image inheritance
 
-[`tozd/base`](https://gitlab.com/tozd/docker/base) ← [`tozd/runit`](https://gitlab.com/tozd/docker/runit) ← [`tozd/nginx`](https://gitlab.com/tozd/docker/nginx) ← [`tozd/nginx-mailer`](https://gitlab.com/tozd/docker/nginx-mailer) ← [`tozd/nginx-cron`](https://gitlab.com/tozd/docker/nginx-cron) ← `tozd/nginx-proxy`
+[`tozd/base`](https://gitlab.com/tozd/docker/base) ← [`tozd/dinit`](https://gitlab.com/tozd/docker/dinit) ← [`tozd/nginx`](https://gitlab.com/tozd/docker/nginx) ← [`tozd/nginx-mailer`](https://gitlab.com/tozd/docker/nginx-mailer) ← [`tozd/nginx-cron`](https://gitlab.com/tozd/docker/nginx-cron) ← `tozd/nginx-proxy`
 
 ## Tags
 
@@ -20,9 +20,9 @@ Available as:
 
 ## Volumes
 
-- `/var/log/dnsmasq`: Log files for an internal lightweight DNS resolver when one is not provided by Docker.
-- `/var/log/dockergen`: Log files for docker-gen.
-- `/var/log/letsencrypt`: Log files for Let's encrypt service.
+- `/var/log/dnsmasq`: Log files for an internal lightweight DNS resolver when one is not provided by Docker and when `LOG_TO_STDOUT` is not set to `1`.
+- `/var/log/dockergen`: Log files for docker-gen when `LOG_TO_STDOUT` is not set to `1`.
+- `/var/log/letsencrypt`: Log files for Let's encrypt service when `LOG_TO_STDOUT` is not set to `1`.
 - `/ssl`: Volume with SSL keys for hosts, together with any optional extra configuration for them. All Let's encrypt generated keys together with Let's encrypt authentication keys are stored here as well. Persist this volume to not lose state.
 
 ## Variables
@@ -30,6 +30,7 @@ Available as:
 - `DOCKER_HOST`: Where to connect to access Docker daemon to monitor for new containers. Default is `/var/run/docker.sock` inside the container.
 - `LETSENCRYPT_EMAIL`: If set, enables automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/) service. By setting it you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/).
 - `LETSENCRYPT_ARGS`: Any additional arguments you might want to pass to Let's encrypt's certbot.
+- `LOG_TO_STDOUT`: If set to `1` output logs to stdout (retrievable using `docker logs`) instead of log volumes.
 
 ## Description
 
@@ -128,7 +129,6 @@ Here is an example of site configuration using DNS resolving:
 server {
     listen 80;
     server_name example.com;
-    access_log /var/log/nginx/example.com_access.log;
 
     # We want to resolve container IPs dynamically, so we use a variable to make
     # Nginx resolve it again and again and not only at the start (so that it works

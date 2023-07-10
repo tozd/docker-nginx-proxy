@@ -10,6 +10,7 @@ VOLUME /ssl
 ENV DOCKER_HOST unix:///var/run/docker.sock
 ENV LETSENCRYPT_EMAIL=
 ENV LETSENCRYPT_ARGS=
+ENV LOG_TO_STDOUT=0
 
 RUN apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common && \

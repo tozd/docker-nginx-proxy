@@ -2,11 +2,9 @@
 
 # If internal DNS is provided by Docker, we do not run.
 if grep -q 127.0.0.11 /etc/resolv.conf ; then
-  # Disable ourselves and our log.
-  sv down dnsmasq
-  sv down dnsmasq/log
-  exit 0
+  # 115 is a special exit code to signal to dinit that this program is disabling itself.
+  exit 115
 else
   # Has to run as root otherwise it tries to keep some capabilities and it fails inside Docker.
-  exec /usr/sbin/dnsmasq --listen-address=127.0.0.11 --addn-hosts=/etc/hosts.extra --keep-in-foreground --bind-interfaces --log-facility=- --user=root 2>&1
+  exec /usr/sbin/dnsmasq --listen-address=127.0.0.11 --addn-hosts=/etc/hosts.extra --keep-in-foreground --bind-interfaces --log-facility=/dev/stdout --user=root
 fi
