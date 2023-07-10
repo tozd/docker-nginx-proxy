@@ -28,7 +28,7 @@ cleanup() {
   fi
 
   if [ "$cleanup_pebble" -ne 0 ]; then
-    echo "Logs proxy"
+    echo "Logs pebble"
     docker logs pebble || true
 
     echo "Stopping Pebble Docker image"
