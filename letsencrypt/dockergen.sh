@@ -60,7 +60,7 @@ done
 
 # We can trigger dockergen rerun always because it does not call us back if list.json
 # does not change, so an infinite loop does not happen.
-pkill -HUP -P 1 dockergen || true
+pkill -HUP -P 1 docker-gen || true
 
 # We reload nginx always because content of files where links are pointing might changed.
 /usr/sbin/nginx -s reload 2>/dev/null || true
