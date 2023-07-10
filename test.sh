@@ -76,11 +76,11 @@ echo "Sleeping"
 sleep 5
 
 echo "Running proxy Docker image"
-docker run -d --name proxy --network testnet --network-alias site.test -p 80:80 -p 443:443 -e "LOG_TO_STDOUT=1" -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
+docker run -d --name proxy --network testnet --network-alias site.test -p 80:80 -p 443:443 -e LOG_TO_STDOUT=1 -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
 cleanup_proxy=1
 
 echo "Running app Docker image"
-docker run -d --name test --network testnet -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/ -e VIRTUAL_LETSENCRYPT=1 testimage
+docker run -d --name test --network testnet -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/ -e LOG_TO_STDOUT=1 -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
 
 echo "Sleeping"
@@ -98,7 +98,7 @@ sleep 1
 docker rm -f test
 cleanup_app=0
 sleep 1
-docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_URL=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
+docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_URL=/foo -e LOG_TO_STDOUT=1 -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
 
 echo "Sleeping"
@@ -113,7 +113,7 @@ sleep 1
 docker rm -f test
 cleanup_app=0
 sleep 1
-docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/foo -e VIRTUAL_LETSENCRYPT=1 testimage
+docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/foo -e LOG_TO_STDOUT=1 -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
 
 echo "Sleeping"
