@@ -15,6 +15,9 @@ cleanup() {
   fi
 
   if [ "$cleanup_proxy" -ne 0 ]; then
+    echo "Logs"
+    docker logs proxy
+
     echo "Stopping proxy Docker image"
     docker stop proxy
   fi
@@ -62,7 +65,7 @@ echo "Sleeping"
 sleep 5
 
 echo "Running proxy Docker image"
-docker run -d --name proxy --network testnet --network-alias site.test --rm -p 80:80 -p 443:443 -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
+docker run -d --name proxy --network testnet --network-alias site.test --rm -p 80:80 -p 443:443 -e "LOG_TO_STDOUT=1" -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
 cleanup_proxy=1
 
 echo "Running app Docker image"
