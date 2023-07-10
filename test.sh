@@ -92,6 +92,7 @@ wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
 docker stop test || true
+sleep 1
 docker rm -f test
 cleanup_app=0
 sleep 1
@@ -106,6 +107,7 @@ wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
 
 echo "Reconfiguring app Docker image"
 docker stop test || true
+sleep 1
 docker rm -f test
 cleanup_app=0
 sleep 1
