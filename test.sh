@@ -10,21 +10,30 @@ cleanup_pebble_image=0
 cleanup_network=0
 cleanup() {
   if [ "$cleanup_app" -ne 0 ]; then
+    echo "Logs app"
+    docker logs test || true
+
     echo "Stopping app Docker image"
-    docker stop test
+    docker stop test || true
+    docker rm -f test
   fi
 
   if [ "$cleanup_proxy" -ne 0 ]; then
-    echo "Logs"
-    docker logs proxy
+    echo "Logs proxy"
+    docker logs proxy || true
 
     echo "Stopping proxy Docker image"
-    docker stop proxy
+    docker stop proxy || true
+    docker rm -f proxy
   fi
 
   if [ "$cleanup_pebble" -ne 0 ]; then
+    echo "Logs proxy"
+    docker logs pebble || true
+
     echo "Stopping Pebble Docker image"
-    docker stop pebble
+    docker stop pebble || true
+    docker rm -f pebble
   fi
 
   if [ "$cleanup_app_image" -ne 0 ]; then
@@ -58,18 +67,18 @@ time docker build -t pebbleimage -f test/pebble.dockerfile test
 cleanup_pebble_image=1
 
 echo "Running Pebble Docker image"
-docker run -d --name pebble --network testnet --rm -p 15000:15000 -e PEBBLE_VA_NOSLEEP=1 -e PEBBLE_WFE_NONCEREJECT=0 -e PEBBLE_AUTHZREUSE=100 pebbleimage
+docker run -d --name pebble --network testnet -p 15000:15000 -e PEBBLE_VA_NOSLEEP=1 -e PEBBLE_WFE_NONCEREJECT=0 -e PEBBLE_AUTHZREUSE=100 pebbleimage
 cleanup_pebble=1
 
 echo "Sleeping"
 sleep 5
 
 echo "Running proxy Docker image"
-docker run -d --name proxy --network testnet --network-alias site.test --rm -p 80:80 -p 443:443 -e "LOG_TO_STDOUT=1" -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
+docker run -d --name proxy --network testnet --network-alias site.test -p 80:80 -p 443:443 -e "LOG_TO_STDOUT=1" -e "LETSENCRYPT_EMAIL=test@example.com" -e "LETSENCRYPT_ARGS=--server https://pebble:14000/dir" -e "REQUESTS_CA_BUNDLE=/letsencrypt/pebble.minica.pem" -v /var/run/docker.sock:/var/run/docker.sock "${CI_REGISTRY_IMAGE}:${TAG}"
 cleanup_proxy=1
 
 echo "Running app Docker image"
-docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/ -e VIRTUAL_LETSENCRYPT=1 testimage
+docker run -d --name test --network testnet -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/ -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
 
 echo "Sleeping"
