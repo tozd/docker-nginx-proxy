@@ -22,7 +22,7 @@ Available as:
 
 - `/var/log/dnsmasq`: Log files for an internal lightweight DNS resolver when one is not provided by Docker and when `LOG_TO_STDOUT` is not set to `1`.
 - `/var/log/dockergen`: Log files for docker-gen when `LOG_TO_STDOUT` is not set to `1`.
-- `/var/log/letsencrypt`: Log files for Let's encrypt service when `LOG_TO_STDOUT` is not set to `1`.
+- `/var/log/letsencrypt`: (Debug) log files for Let's encrypt service.
 - `/ssl`: Volume with SSL keys for hosts, together with any optional extra configuration for them. All Let's encrypt generated keys together with Let's encrypt authentication keys are stored here as well. Persist this volume to not lose state.
 
 ## Variables
