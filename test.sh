@@ -73,7 +73,7 @@ docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VI
 cleanup_app=1
 
 echo "Sleeping"
-sleep 30
+sleep 20
 
 echo "Testing"
 ADDRESS="$(getent hosts docker | awk '{print $1}')"
@@ -89,7 +89,7 @@ docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VI
 cleanup_app=1
 
 echo "Sleeping"
-sleep 30
+sleep 20
 
 echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
@@ -102,7 +102,7 @@ docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VI
 cleanup_app=1
 
 echo "Sleeping"
-sleep 30
+sleep 20
 
 echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Foo site</title>'
