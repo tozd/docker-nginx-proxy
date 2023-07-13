@@ -38,6 +38,8 @@ Image providing a reverse-proxy using [Nginx](http://nginx.org) HTTP server with
 
 You can use this image as it is, or you can extend it and add configuration files for your virtual hosts.
 
+When `LOG_TO_STDOUT` is set to `1`, Docker image logs output to stdout and stderr. All stdout output is JSON.
+
 ## Automatic configuration
 
 This image uses [docker-gen](https://github.com/jwilder/docker-gen) to dynamically generate Nginx configuration files
