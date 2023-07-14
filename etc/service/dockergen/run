@@ -8,4 +8,5 @@ while ! pgrep -P 1 nginx >/dev/null ; do
   sleep 1
 done
 
+# docker-gen logs to stderr, so we redirect it to stdout.
 exec /dockergen/docker-gen -config /dockergen/dockergen.conf 2>&1
