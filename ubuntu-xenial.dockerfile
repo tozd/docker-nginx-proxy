@@ -13,7 +13,7 @@ ENV LETSENCRYPT_ARGS=
 ENV LOG_TO_STDOUT=0
 
 RUN apt-get update -q -q && \
-  apt-get --yes --force-yes install software-properties-common && \
+  apt-get --yes --force-yes install software-properties-common apt-transport-https && \
   add-apt-repository --yes universe && \
   echo "deb https://ppa.launchpadcontent.net/certbot/certbot/ubuntu xenial main" > /etc/apt/sources.list.d/certbot.list && \
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8C47BE8E75BCA694 && \
