@@ -17,7 +17,7 @@ RUN mkdir ~/.gnupg && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
   apt-get --yes --force-yes install software-properties-common && \
   add-apt-repository --yes universe && \
   echo "deb https://ppa.launchpadcontent.net/certbot/certbot/ubuntu bionic main" > /etc/apt/sources.list.d/certbot.list && \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8C47BE8E75BCA694 && \
+  apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8C47BE8E75BCA694 && \
   apt-get update -q -q && \
   apt-get --yes --force-yes install certbot wget ca-certificates dnsmasq && \
   rm -f /etc/cron.d/certbot && \
