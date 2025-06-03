@@ -17,6 +17,7 @@ Available as:
 - `ubuntu-bionic`
 - `ubuntu-focal`
 - `ubuntu-jammy`
+- `ubuntu-noble`
 
 ## Volumes
 
