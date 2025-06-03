@@ -12,7 +12,7 @@ ENV LETSENCRYPT_EMAIL=
 ENV LETSENCRYPT_ARGS=
 ENV LOG_TO_STDOUT=0
 
-RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
+RUN mkdir ~/.gnupg && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
   apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common && \
   add-apt-repository --yes universe && \
@@ -28,7 +28,7 @@ RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
   mkdir -p /ssl/letsencrypt && \
   mkdir -p /letsencrypt && \
   wget -P /letsencrypt https://raw.githubusercontent.com/letsencrypt/pebble/main/test/certs/pebble.minica.pem && \
-  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm ~/.gnupg
 
 COPY ./etc/cron.daily /etc/cron.daily
 COPY ./etc/nginx /etc/nginx
