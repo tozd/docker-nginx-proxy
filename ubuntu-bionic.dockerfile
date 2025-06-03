@@ -12,7 +12,8 @@ ENV LETSENCRYPT_EMAIL=
 ENV LETSENCRYPT_ARGS=
 ENV LOG_TO_STDOUT=0
 
-RUN apt-get update -q -q && \
+RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
+  apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common && \
   add-apt-repository --yes universe && \
   echo "deb https://ppa.launchpadcontent.net/certbot/certbot/ubuntu bionic main" > /etc/apt/sources.list.d/certbot.list && \
