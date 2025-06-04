@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+trap 'echo "ERROR: $BASH_SOURCE:$LINENO $BASH_COMMAND" >&2' ERR
+
 if [ "${LOG_TO_STDOUT}" != "1" ]; then
   mkdir -p /var/log/dockergen
   chown nobody:nogroup /var/log/dockergen

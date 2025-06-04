@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+trap 'echo "ERROR: $BASH_SOURCE:$LINENO $BASH_COMMAND" >&2' ERR
+
 mkdir -p /ssl/webroot
 
 # Depend on the nginx service to be up (so that Let's encrypt can potentially

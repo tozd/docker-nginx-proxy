@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+trap 'echo "ERROR: $BASH_SOURCE:$LINENO $BASH_COMMAND" >&2' ERR
+
 # If internal DNS is provided by Docker, we do not run.
 if grep -q 127.0.0.11 /etc/resolv.conf ; then
   # 115 is a special exit code to signal to dinit that this program is disabling itself.
