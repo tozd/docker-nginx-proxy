@@ -7,10 +7,13 @@ VOLUME /var/log/dockergen
 VOLUME /var/log/letsencrypt
 VOLUME /ssl
 
-ENV DOCKER_HOST unix:///var/run/docker.sock
+ENV DOCKER_HOST=unix:///var/run/docker.sock
 ENV LETSENCRYPT_EMAIL=
 ENV LETSENCRYPT_ARGS=
 ENV LOG_TO_STDOUT=0
+ENV NGINX_HTTPS_PORT=434
+ENV NGINX_HTTPS_PROTOCOLS="TLSv1.2 TLSv1.3"
+ENV NGINX_HTTPS_CIPHERS="HIGH:!aNULL:!MD5"
 
 RUN apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common && \

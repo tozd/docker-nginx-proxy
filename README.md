@@ -33,6 +33,8 @@ Available as:
 - `LETSENCRYPT_ARGS`: Any additional arguments you might want to pass to Let's encrypt's certbot.
 - `LOG_TO_STDOUT`: If set to `1` output logs to stdout (retrievable using `docker logs`) instead of log volumes.
 - `NGINX_HTTPS_PORT`: If set, listen on this port for HTTPS traffic instead of the default `443`.
+- `NGINX_HTTPS_PROTOCOLS`: Sets [SSL protocols](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_protocols) for HTTPS virtual hosts. Default is `TLSv1.2 TLSv1.3`.
+- `NGINX_HTTPS_CIPHERS`: Sets [SSL ciphers](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_ciphers) for HTTPS virtual hosts. Default is `HIGH:!aNULL:!MD5`.
 
 ## Description
 
