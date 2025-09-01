@@ -149,6 +149,9 @@ server {
 
     ssl_certificate /ssl/{{ $host }}.crt;
     ssl_certificate_key /ssl/{{ $host }}.key;
+    ssl_trusted_certificate /ssl/letsencrypt/live/{{ $host }}/chain.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
 
     {{ if (exists (printf "/ssl/%s_ssl.conf" $host)) }}
     include /ssl/{{ $host }}_ssl.conf;
