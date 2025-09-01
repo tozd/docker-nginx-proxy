@@ -32,6 +32,7 @@ Available as:
 - `LETSENCRYPT_EMAIL`: If set, enables automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/) service. By setting it you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/).
 - `LETSENCRYPT_ARGS`: Any additional arguments you might want to pass to Let's encrypt's certbot.
 - `LOG_TO_STDOUT`: If set to `1` output logs to stdout (retrievable using `docker logs`) instead of log volumes.
+- `NGINX_HTTPS_PORT`: If set, listen on this port for HTTPS traffic instead of the default `443`.
 
 ## Description
 
