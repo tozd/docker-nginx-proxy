@@ -6,6 +6,7 @@ if [[ -z "${LETSENCRYPT_EMAIL}" ]]; then
 fi
 
 mkdir -p /ssl/letsencrypt
+touch /ssl/letsencrypt.list
 touch /ssl/letsencrypt.manual.list
 
 # List of hosts with Let's encrypt enabled.
