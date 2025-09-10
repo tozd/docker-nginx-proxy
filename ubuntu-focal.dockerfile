@@ -21,9 +21,9 @@ RUN apt-get update -q -q && \
   apt-get --yes --force-yes install certbot wget ca-certificates dnsmasq && \
   rm -f /etc/cron.d/certbot && \
   mkdir /dockergen && \
-  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.10.4/docker-gen-linux-amd64-0.10.4.tar.gz && \
-  tar xf /dockergen/docker-gen-linux-amd64-0.10.4.tar.gz -C /dockergen && \
-  rm -f /dockergen/docker-gen-linux-amd64-0.10.4.tar.gz && \
+  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.15.1/docker-gen-linux-amd64-0.15.1.tar.gz && \
+  tar xf /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz -C /dockergen && \
+  rm -f /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz && \
   mkdir -p /ssl/letsencrypt && \
   mkdir -p /letsencrypt && \
   wget -P /letsencrypt https://raw.githubusercontent.com/letsencrypt/pebble/main/test/certs/pebble.minica.pem && \
