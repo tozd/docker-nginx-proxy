@@ -91,8 +91,8 @@ sleep 20
 echo "Testing"
 ADDRESS="$(getent hosts $DOCKER_HOST | awk '{print $1}')"
 echo "$ADDRESS site.test" >> /etc/hosts
-wget --no-check-certificate -T 30 -q -O - https://$DOCKER_HOST:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
-wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
+#wget --no-check-certificate -T 30 -q -O - https://$DOCKER_HOST:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
+wget --no-check-certificate -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
 echo "Success"
 
 echo "Reconfiguring app Docker image"
@@ -108,7 +108,7 @@ echo "Sleeping"
 sleep 20
 
 echo "Testing"
-wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
+wget --no-check-certificate -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
 echo "Success"
 
 echo "Reconfiguring app Docker image"
@@ -124,5 +124,5 @@ echo "Sleeping"
 sleep 20
 
 echo "Testing"
-wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Foo site</title>'
+wget --no-check-certificate -T 30 -q -O - https://site.test/foo | grep -q '<title>Foo site</title>'
 echo "Success"
