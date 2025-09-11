@@ -2,6 +2,8 @@
 
 set -e
 
+DOCKER_HOST=docker
+
 cleanup_app=0
 cleanup_proxy=0
 cleanup_pebble=0
@@ -87,9 +89,9 @@ echo "Sleeping"
 sleep 20
 
 echo "Testing"
-ADDRESS="$(getent hosts docker | awk '{print $1}')"
+ADDRESS="$(getent hosts $DOCKER_HOST | awk '{print $1}')"
 echo "$ADDRESS site.test" >> /etc/hosts
-wget --no-check-certificate -T 30 -q -O - https://docker:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
+wget --no-check-certificate -T 30 -q -O - https://$DOCKER_HOST:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
 wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
 echo "Success"
 
