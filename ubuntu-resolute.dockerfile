@@ -1,0 +1,36 @@
+FROM registry.gitlab.com/tozd/docker/nginx-cron:ubuntu-resolute
+
+EXPOSE 443/tcp
+
+VOLUME /var/log/dnsmasq
+VOLUME /var/log/dockergen
+VOLUME /var/log/letsencrypt
+VOLUME /ssl
+
+ENV DOCKER_HOST=unix:///var/run/docker.sock
+ENV LETSENCRYPT_EMAIL=
+ENV LETSENCRYPT_ARGS=
+ENV LOG_TO_STDOUT=0
+ENV NGINX_HTTPS_PORT=443
+ENV NGINX_HTTPS_PROTOCOLS="TLSv1.2 TLSv1.3"
+ENV NGINX_HTTPS_CIPHERS="HIGH:!aNULL:!MD5"
+
+RUN apt-get update -q -q && \
+  apt-get --yes --force-yes install software-properties-common && \
+  add-apt-repository --yes universe && \
+  apt-get --yes --force-yes install certbot wget ca-certificates dnsmasq && \
+  rm -f /etc/cron.d/certbot && \
+  mkdir /dockergen && \
+  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.15.1/docker-gen-linux-amd64-0.15.1.tar.gz && \
+  tar xf /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz -C /dockergen && \
+  rm -f /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz && \
+  mkdir -p /ssl/letsencrypt && \
+  mkdir -p /letsencrypt && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm
+
+COPY ./etc/cron.daily /etc/cron.daily
+COPY ./etc/nginx /etc/nginx
+COPY ./etc/service/dnsmasq /etc/service/dnsmasq
+COPY ./etc/service/dockergen /etc/service/dockergen
+COPY ./dockergen /dockergen
+COPY ./letsencrypt /letsencrypt

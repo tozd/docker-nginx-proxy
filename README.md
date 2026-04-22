@@ -18,6 +18,7 @@ Available as:
 - `ubuntu-focal`
 - `ubuntu-jammy`
 - `ubuntu-noble`
+- `ubuntu-resolute`
 
 ## Volumes
 
