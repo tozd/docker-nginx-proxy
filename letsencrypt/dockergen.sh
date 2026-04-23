@@ -45,7 +45,7 @@ for host in $HOSTS; do
   ln -f -s "letsencrypt/live/${host}/fullchain.pem" "/ssl/${host}.crt"
 done
 
-EXISTING_HOSTS="$(find /ssl -maxdepth 1 -lname 'letsencrypt*' -printf '%f\n' | rev | cut --fields=2- --delimiter '.' | rev | sort --unique)"
+EXISTING_HOSTS="$(find /ssl -maxdepth 1 -lname 'letsencrypt*' -printf '%f\n' | sed 's/\.[^.]*$//' | sort --unique)"
 
 for host in $EXISTING_HOSTS; do
   if ! echo "${HOSTS}" | grep --quiet --line-regexp --fixed-strings "${host}"; then
