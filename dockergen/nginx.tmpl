@@ -164,7 +164,7 @@ server {
 server {
     listen 80;
 
-    server_name {{ $host }} *.{{ $host }};
+    server_name {{ $host }};
 {{ end }}
 
     {{ if eq $.Env.LOG_TO_STDOUT "1" }}
@@ -184,9 +184,13 @@ server {
         # / at the end of the proxy_pass means that all requests to this
         # location are proxied to the root of the container.
         proxy_pass http://{{ $host }}{{ replace $url "/" "-" -1 }}u/;
-        # Making sure Location always has external scheme.
-        proxy_redirect http://{{ $host }}/ /;
-        proxy_redirect https://{{ $host }}/ /;
+        # Upstream may emit Location with its internal "http://$host/"; rewrite
+        # to a relative URL so nginx re-stamps it with the external scheme
+        # (absolute_redirect is set to on by default in nginx).
+        # We deliberately do not rewrite "https://$host/". An upstream that
+        # explicitly redirects to HTTPS must be preserved verbatim to not
+        # downgrade it back to HTTP.
+        proxy_redirect http://$host/ /;
     }
 {{ end }}
 
@@ -195,9 +199,13 @@ server {
         # No / at the end of the proxy_pass means that all requests to this
         # location are proxied to the same location of the container.
         proxy_pass http://{{ $host }}{{ replace $alias "/" "-" -1 }}a;
-        # Making sure Location always has external scheme.
-        proxy_redirect http://{{ $host }}/ /;
-        proxy_redirect https://{{ $host }}/ /;
+        # Upstream may emit Location with its internal "http://$host/"; rewrite
+        # to a relative URL so nginx re-stamps it with the external scheme
+        # (absolute_redirect is set to on by default in nginx).
+        # We deliberately do not rewrite "https://$host/". An upstream that
+        # explicitly redirects to HTTPS must be preserved verbatim to not
+        # downgrade it back to HTTP.
+        proxy_redirect http://$host/ /;
     }
 {{ end }}
 }
