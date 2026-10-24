@@ -32,9 +32,6 @@ RUN mkdir ~/.gnupg && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf && \
   mkdir -p /letsencrypt && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm ~/.gnupg
 
-COPY ./etc/cron.daily /etc/cron.daily
-COPY ./etc/nginx /etc/nginx
-COPY ./etc/service/dnsmasq /etc/service/dnsmasq
-COPY ./etc/service/dockergen /etc/service/dockergen
+COPY ./etc /etc
 COPY ./dockergen /dockergen
 COPY ./letsencrypt /letsencrypt
