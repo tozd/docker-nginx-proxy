@@ -1,6 +1,10 @@
 proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+# The value sent by the client is replaced and not appended to, so that containers which
+# take the left-most address as the client's address cannot be given a spoofed one.
+proxy_set_header X-Forwarded-For $remote_addr;
 proxy_set_header X-Forwarded-Proto $scheme;
+# $forwarded_prefix is defined in conf.d/proxy.conf.
+proxy_set_header X-Forwarded-Prefix $forwarded_prefix;
 
 # Hack for proper handling of multiline certificates.
 # Variables are defined in conf.d/proxy.conf.

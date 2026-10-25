@@ -89,6 +89,15 @@ would from the perspective of the container, from the outside might resolve to s
 at all. This is why it is often better to serve content in containers under the same path as outside, and use
 `VIRTUAL_ALIAS` to map them 1:1. But this means that the container has to be configured accordingly as well.
 
+For `VIRTUAL_URL`, the reverse proxy passes the outside URL path (without a trailing `/`) to the container in the
+`X-Forwarded-Prefix` HTTP request header, which some applications can use to generate correct references.
+
+The reverse proxy passes the client's IP address to the container in `X-Real-IP` and `X-Forwarded-For` HTTP request
+headers and the scheme used by the client in `X-Forwarded-Proto`. Any `X-Real-IP`, `X-Forwarded-For` and `X-Forwarded-Prefix`
+headers sent by the client are replaced. If you run another reverse proxy (e.g., a CDN) in front of this one, set `SET_REAL_IP_FROM`
+environment variable (inherited from [`tozd/nginx`](https://gitlab.com/tozd/docker/nginx)) to a comma separated list of its
+addresses, so that the client's IP address is determined from the `X-Forwarded-For` header the proxy sends.
+
 ### HTTPS
 
 If you want to use HTTPS for a virtual host, you should mount a `/ssl` volume into the container and provide

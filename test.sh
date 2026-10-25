@@ -95,6 +95,18 @@ ADDRESS="$(getent hosts $DOCKER_HOST | awk '{print $1}')"
 echo "$ADDRESS site.test" >> /etc/hosts
 wget --no-check-certificate -T 30 -q -O - https://$DOCKER_HOST:15000/roots/0 >> /etc/ssl/certs/ca-certificates.crt
 wget -T 30 -q -O - https://site.test | grep -q '<title>Test site</title>'
+FORWARDED_FOR="$(wget -T 30 -q -O - --header 'X-Forwarded-For: 192.0.2.1' https://site.test/forwarded-for)"
+case "$FORWARDED_FOR" in
+  ""|*192.0.2.1*)
+    echo "Unexpected X-Forwarded-For: $FORWARDED_FOR"
+    exit 1
+    ;;
+esac
+FORWARDED_PREFIX="$(wget -T 30 -q -O - --header 'X-Forwarded-Prefix: /evil' https://site.test/forwarded-prefix)"
+if [ -n "$FORWARDED_PREFIX" ]; then
+  echo "Unexpected X-Forwarded-Prefix: $FORWARDED_PREFIX"
+  exit 1
+fi
 echo "Success"
 
 echo "Reconfiguring app Docker image"
@@ -111,6 +123,11 @@ sleep 20
 
 echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Test site</title>'
+FORWARDED_PREFIX="$(wget -T 30 -q -O - --header 'X-Forwarded-Prefix: /evil' https://site.test/foo/forwarded-prefix)"
+if [ "$FORWARDED_PREFIX" != "/foo" ]; then
+  echo "Unexpected X-Forwarded-Prefix: $FORWARDED_PREFIX"
+  exit 1
+fi
 echo "Success"
 
 echo "Reconfiguring app Docker image"

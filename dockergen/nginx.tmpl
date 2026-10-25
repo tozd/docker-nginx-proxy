@@ -184,6 +184,8 @@ server {
         # / at the end of the proxy_pass means that all requests to this
         # location are proxied to the root of the container.
         proxy_pass http://{{ $host }}{{ replace $url "/" "-" -1 }}u/;
+        # The container gets the stripped path prefix in the X-Forwarded-Prefix header.
+        set $forwarded_prefix "{{ trimSuffix "/" $url }}";
         # Upstream may emit Location with its internal "http://$host/"; rewrite
         # to a relative URL so nginx re-stamps it with the external scheme
         # (absolute_redirect is set to on by default in nginx).
