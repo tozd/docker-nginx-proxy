@@ -121,6 +121,10 @@ on any container having `VIRTUAL_LETSENCRYPT` environment variable set will get 
 generated and enabled, and periodically renewed.
 
 All generated keys together with Let's encrypt authentication keys are stored under `/ssl` volume.
+For each host, `/ssl/<host>.key` and `/ssl/<host>.crt` symlinks to them are created, which enable HTTPS for the host.
+A certificate is obtained as soon as a container for a new host starts and certificates are renewed daily.
+If `/ssl/<host>.key` or `/ssl/<host>.crt` exist and were not created by the image (regular files or symlinks
+pointing elsewhere), they take precedence and are never modified or removed.
 
 You should probably configure [`MAILTO` environment variable](https://gitlab.com/tozd/docker/nginx-cron) to your e-mail
 address to receive reports from the daily cron job, and regularly check logs in `/var/log/letsencrypt` and

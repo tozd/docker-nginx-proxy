@@ -4,4 +4,4 @@
 # We need access to at least LETSENCRYPT_EMAIL.
 . /dev/shm/cron-environment
 
-/letsencrypt/dockergen.sh
+/letsencrypt/dockergen.sh cron

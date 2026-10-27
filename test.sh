@@ -58,9 +58,46 @@ cleanup() {
 
 trap cleanup EXIT
 
+# Waits until the proxy does not serve the site anymore.
+wait_site_removed() {
+  for i in $(seq 1 30); do
+    if [ "$(curl -s -o /dev/null -w '%{http_code}' "http://site.test$1")" = "404" ]; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "Site is still served"
+  return 1
+}
+
+# Waits until the proxy serves the site and checks that it is served with HTTPS from the start: when the HTTPS
+# server block is enabled, HTTP requests are redirected to HTTPS, otherwise they are proxied to the app.
+check_https_enabled() {
+  for i in $(seq 1 30); do
+    code="$(curl -s -o /dev/null -w '%{http_code}' "http://site.test$1")"
+    case "$code" in
+      301)
+        return 0
+        ;;
+      404|000)
+        ;;
+      *)
+        echo "Site is served without HTTPS (HTTP status $code)"
+        return 1
+        ;;
+    esac
+    sleep 1
+  done
+  echo "Site is not served"
+  return 1
+}
+
 echo "Creating Docker network"
 time docker network create testnet
 cleanup_network=1
+
+echo "Preparing"
+apk add --no-cache curl
 
 echo "Creating app Docker image"
 time docker build -t testimage -f test/app.dockerfile --build-arg "IMAGE=registry.gitlab.com/tozd/docker/nginx:${TAG}" test
@@ -114,9 +151,12 @@ docker stop test
 sleep 1
 docker rm -f test
 cleanup_app=0
-sleep 1
+wait_site_removed /foo
 docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_URL=/foo -e LOG_TO_STDOUT=1 -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
+
+echo "Testing that recreated app has HTTPS from the start"
+check_https_enabled /foo
 
 echo "Sleeping"
 sleep 20
@@ -135,13 +175,56 @@ docker stop test
 sleep 1
 docker rm -f test
 cleanup_app=0
-sleep 1
+wait_site_removed /foo
 docker run -d --name test --network testnet --rm -e VIRTUAL_HOST=site.test -e VIRTUAL_ALIAS=/foo -e LOG_TO_STDOUT=1 -e VIRTUAL_LETSENCRYPT=1 testimage
 cleanup_app=1
+
+echo "Testing that recreated app has HTTPS from the start"
+check_https_enabled /foo
 
 echo "Sleeping"
 sleep 20
 
 echo "Testing"
 wget -T 30 -q -O - https://site.test/foo | grep -q '<title>Foo site</title>'
+echo "Success"
+
+echo "Stopping app Docker image"
+docker stop test
+cleanup_app=0
+for i in $(seq 1 30); do
+  if ! docker exec proxy grep -q -x site.test /ssl/letsencrypt.list; then
+    break
+  fi
+  sleep 1
+done
+
+echo "Adding manual certificates"
+# A regular file, a symlink into Let's encrypt files of another host, and a listed host with manual certificates.
+docker exec proxy sh -c 'printf manual > /ssl/manual.test.crt && printf manual > /ssl/manual.test.key && echo manual.test >> /ssl/letsencrypt.manual.list'
+docker exec proxy sh -c 'ln -s letsencrypt/live/site.test/fullchain.pem /ssl/alias.test.crt && ln -s letsencrypt/live/site.test/privkey.pem /ssl/alias.test.key'
+
+echo "Testing that the first daily run waits for the lock and keeps certificate links"
+docker exec -d proxy flock /run/lock/letsencrypt sleep 10
+sleep 1
+start="$(date +%s)"
+docker exec proxy /etc/cron.daily/letsencrypt
+if [ "$(($(date +%s) - start))" -lt 5 ]; then
+  echo "Daily run did not wait for the lock"
+  exit 1
+fi
+docker exec proxy test -L /ssl/site.test.crt
+docker exec proxy test -L /ssl/site.test.key
+docker exec proxy grep -q -x site.test /ssl/letsencrypt.missing
+echo "Success"
+
+echo "Testing that the second daily run removes certificate links and keeps manual certificates"
+docker exec proxy /etc/cron.daily/letsencrypt
+if docker exec proxy test -L /ssl/site.test.crt || docker exec proxy test -L /ssl/site.test.key; then
+  echo "Certificate links were not removed"
+  exit 1
+fi
+test "$(docker exec proxy cat /ssl/manual.test.crt /ssl/manual.test.key)" = "manualmanual"
+test "$(docker exec proxy readlink /ssl/alias.test.crt)" = "letsencrypt/live/site.test/fullchain.pem"
+test "$(docker exec proxy readlink /ssl/alias.test.key)" = "letsencrypt/live/site.test/privkey.pem"
 echo "Success"
