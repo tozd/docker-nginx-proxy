@@ -11,4 +11,5 @@ while ! pgrep -P 1 nginx >/dev/null ; do
 done
 
 # docker-gen logs to stderr, so we redirect it to stdout.
-exec /dockergen/docker-gen -config /dockergen/dockergen.conf 2>&1
+# DOCKERGEN_ARGS is unquoted on purpose so that it can contain multiple arguments.
+exec /dockergen/docker-gen ${DOCKERGEN_ARGS} -config /dockergen/dockergen.conf 2>&1

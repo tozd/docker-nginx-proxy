@@ -56,6 +56,7 @@ is_manual() {
 }
 
 FAILED=0
+CHANGED=0
 
 # List of hosts with Let's encrypt enabled.
 HOSTS="$(cat /ssl/letsencrypt.list /ssl/letsencrypt.manual.list)"
@@ -73,12 +74,17 @@ for host in $HOSTS; do
   # Docker-gen runs call certbot only for certificates which are missing or close to expiry (e.g., when a host
   # is listed again after a long time), so that they finish quickly. Daily runs let certbot renew all certificates.
   if [ "${MODE}" = "cron" ] || ! openssl x509 -checkend "$((7 * 24 * 60 * 60))" -noout -in "/ssl/${crt_target}" >/dev/null 2>&1; then
+    # certbot stores every obtained certificate into a new file and points the symlink under live/ to it.
+    before="$(readlink -f "/ssl/${crt_target}" 2>/dev/null || true)"
     # Both --key-type and --cert-name are passed so that certbot renews an existing certificate with a different
     # key type immediately as ECDSA instead of refusing to renew it.
     if ! certbot --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
      --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --key-type ecdsa --cert-name "${host}" \
      --webroot-path "/ssl/webroot/${host}" --domain "${host}" ${LETSENCRYPT_ARGS} ; then
       echo "Obtaining or renewing certificate for '${host}' failed."
+    fi
+    if [ "$(readlink -f "/ssl/${crt_target}" 2>/dev/null || true)" != "${before}" ]; then
+      CHANGED=1
     fi
   fi
 
@@ -91,9 +97,11 @@ for host in $HOSTS; do
   # Symlinks are created only when missing, so that they never disappear, not even briefly.
   if [ ! -L "/ssl/${host}.key" ]; then
     ln -s "${key_target}" "/ssl/${host}.key"
+    CHANGED=1
   fi
   if [ ! -L "/ssl/${host}.crt" ]; then
     ln -s "${crt_target}" "/ssl/${host}.crt"
+    CHANGED=1
   fi
 done
 
@@ -129,9 +137,11 @@ if [ "${MODE}" = "cron" ]; then
       # We make sure we are removing only symlinks created by this script.
       if [ "$(readlink "/ssl/${host}.key")" = "letsencrypt/live/${host}/privkey.pem" ]; then
         rm -f "/ssl/${host}.key"
+        CHANGED=1
       fi
       if [ "$(readlink "/ssl/${host}.crt")" = "letsencrypt/live/${host}/fullchain.pem" ]; then
         rm -f "/ssl/${host}.crt"
+        CHANGED=1
       fi
     else
       STILL_MISSING="${STILL_MISSING}${host}"$'\n'
@@ -141,11 +151,15 @@ if [ "${MODE}" = "cron" ]; then
   mv "${MISSING_FILE}.tmp" "${MISSING_FILE}"
 fi
 
-# We trigger docker-gen rerun so that it renders the nginx template again with current symlinks. It does not
-# call this script back if the list of hosts does not change, so an infinite loop does not happen.
-pkill -HUP -P 1 docker-gen || true
+# Docker-gen and nginx are signaled only when symlinks or certificates changed, which is rarely the case for runs
+# triggered by docker-gen, e.g., when a container is recreated.
+if [ "${CHANGED}" = "1" ]; then
+  # We trigger docker-gen rerun so that it renders the nginx template again with current symlinks. It does not
+  # call this script back if the list of hosts does not change, so an infinite loop does not happen.
+  pkill -HUP -P 1 docker-gen || true
 
-# We reload nginx always because content of files where links are pointing might have changed.
-/usr/sbin/nginx -s reload 2>/dev/null || true
+  # We reload nginx as well because content of files where links are pointing might have changed.
+  /usr/sbin/nginx -s reload 2>/dev/null || true
+fi
 
 exit "${FAILED}"

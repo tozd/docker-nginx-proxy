@@ -14,6 +14,9 @@ ENV LOG_TO_STDOUT=0
 ENV NGINX_HTTPS_PORT=443
 ENV NGINX_HTTPS_PROTOCOLS="TLSv1.2 TLSv1.3"
 ENV NGINX_HTTPS_CIPHERS="HIGH:!aNULL:!MD5"
+# Containers are often connected to a network only after they start, so docker-gen also watches network
+# connect and disconnect events, in addition to its default container events.
+ENV DOCKERGEN_ARGS="-event-filter event=connect -event-filter event=disconnect"
 
 RUN apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common && \
@@ -21,9 +24,9 @@ RUN apt-get update -q -q && \
   apt-get --yes --force-yes install certbot wget ca-certificates dnsmasq && \
   rm -f /etc/cron.d/certbot && \
   mkdir /dockergen && \
-  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.15.1/docker-gen-linux-amd64-0.15.1.tar.gz && \
-  tar xf /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz -C /dockergen && \
-  rm -f /dockergen/docker-gen-linux-amd64-0.15.1.tar.gz && \
+  wget -P /dockergen https://github.com/jwilder/docker-gen/releases/download/0.17.2/docker-gen-linux-amd64-0.17.2.tar.gz && \
+  tar xf /dockergen/docker-gen-linux-amd64-0.17.2.tar.gz -C /dockergen && \
+  rm -f /dockergen/docker-gen-linux-amd64-0.17.2.tar.gz && \
   mkdir -p /ssl/letsencrypt && \
   mkdir -p /letsencrypt && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ~/.cache ~/.npm
