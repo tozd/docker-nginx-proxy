@@ -144,6 +144,7 @@ if [ -n "$FORWARDED_PREFIX" ]; then
   echo "Unexpected X-Forwarded-Prefix: $FORWARDED_PREFIX"
   exit 1
 fi
+docker exec proxy openssl x509 -noout -text -in /ssl/site.test.crt | grep -q 'Public Key Algorithm: id-ecPublicKey'
 echo "Success"
 
 echo "Reconfiguring app Docker image"

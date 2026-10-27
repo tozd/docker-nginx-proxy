@@ -73,8 +73,10 @@ for host in $HOSTS; do
   # Docker-gen runs call certbot only for certificates which are missing or close to expiry (e.g., when a host
   # is listed again after a long time), so that they finish quickly. Daily runs let certbot renew all certificates.
   if [ "${MODE}" = "cron" ] || ! openssl x509 -checkend "$((7 * 24 * 60 * 60))" -noout -in "/ssl/${crt_target}" >/dev/null 2>&1; then
+    # Both --key-type and --cert-name are passed so that certbot renews an existing certificate with a different
+    # key type immediately as ECDSA instead of refusing to renew it.
     if ! certbot --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
-     --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --rsa-key-size 4096 \
+     --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --key-type ecdsa --cert-name "${host}" \
      --webroot-path "/ssl/webroot/${host}" --domain "${host}" ${LETSENCRYPT_ARGS} ; then
       echo "Obtaining or renewing certificate for '${host}' failed."
     fi
