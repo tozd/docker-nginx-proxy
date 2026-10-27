@@ -144,7 +144,10 @@ if [ -n "$FORWARDED_PREFIX" ]; then
   echo "Unexpected X-Forwarded-Prefix: $FORWARDED_PREFIX"
   exit 1
 fi
-docker exec proxy openssl x509 -noout -text -in /ssl/site.test.crt | grep -q 'Public Key Algorithm: id-ecPublicKey'
+# Older certbot versions cannot select the key type and use RSA keys.
+if docker exec proxy sh -c 'certbot --help all 2>/dev/null | grep -q -- --key-type'; then
+  docker exec proxy openssl x509 -noout -text -in /ssl/site.test.crt | grep -q 'Public Key Algorithm: id-ecPublicKey'
+fi
 echo "Success"
 
 echo "Reconfiguring app Docker image"

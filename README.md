@@ -124,6 +124,7 @@ All generated keys together with Let's encrypt authentication keys are stored un
 For each host, `/ssl/<host>.key` and `/ssl/<host>.crt` symlinks to them are created, which enable HTTPS for the host.
 A certificate is obtained as soon as a container for a new host starts and certificates are renewed daily.
 Certificates use ECDSA keys. Existing certificates with other key types are replaced by the next daily run.
+`ubuntu-xenial`, `ubuntu-bionic`, and `ubuntu-focal` tags use RSA keys because their certbot cannot select the key type.
 If `/ssl/<host>.key` or `/ssl/<host>.crt` exist and were not created by the image (regular files or symlinks
 pointing elsewhere), they take precedence and are never modified or removed.
 

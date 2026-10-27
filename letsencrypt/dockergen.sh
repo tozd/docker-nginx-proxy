@@ -57,6 +57,7 @@ is_manual() {
 
 FAILED=0
 CHANGED=0
+KEY_ARGS=""
 
 # List of hosts with Let's encrypt enabled.
 HOSTS="$(cat /ssl/letsencrypt.list /ssl/letsencrypt.manual.list)"
@@ -74,12 +75,21 @@ for host in $HOSTS; do
   # Docker-gen runs call certbot only for certificates which are missing or close to expiry (e.g., when a host
   # is listed again after a long time), so that they finish quickly. Daily runs let certbot renew all certificates.
   if [ "${MODE}" = "cron" ] || ! openssl x509 -checkend "$((7 * 24 * 60 * 60))" -noout -in "/ssl/${crt_target}" >/dev/null 2>&1; then
+    # certbot versions older than 1.10 cannot select the key type and use RSA keys. This is determined only
+    # once and only when certbot is needed, because running certbot is slow.
+    if [ -z "${KEY_ARGS}" ]; then
+      if certbot --help all 2>/dev/null | grep --quiet -- '--key-type'; then
+        KEY_ARGS="--key-type ecdsa"
+      else
+        KEY_ARGS="--rsa-key-size 4096"
+      fi
+    fi
     # certbot stores every obtained certificate into a new file and points the symlink under live/ to it.
     before="$(readlink -f "/ssl/${crt_target}" 2>/dev/null || true)"
     # Both --key-type and --cert-name are passed so that certbot renews an existing certificate with a different
     # key type immediately as ECDSA instead of refusing to renew it.
     if ! certbot --noninteractive --quiet --agree-tos --email "${LETSENCRYPT_EMAIL}" \
-     --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring --key-type ecdsa --cert-name "${host}" \
+     --config-dir /ssl/letsencrypt certonly --webroot --keep-until-expiring ${KEY_ARGS} --cert-name "${host}" \
      --webroot-path "/ssl/webroot/${host}" --domain "${host}" ${LETSENCRYPT_ARGS} ; then
       echo "Obtaining or renewing certificate for '${host}' failed."
     fi
