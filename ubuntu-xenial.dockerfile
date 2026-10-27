@@ -14,6 +14,7 @@ ENV LOG_TO_STDOUT=0
 ENV NGINX_HTTPS_PORT=443
 ENV NGINX_HTTPS_PROTOCOLS="TLSv1 TLSv1.1 TLSv1.2"
 ENV NGINX_HTTPS_CIPHERS="HIGH:!aNULL:!MD5"
+ENV NGINX_HTTPS_REJECT_UNKNOWN=0
 
 RUN apt-get update -q -q && \
   apt-get --yes --force-yes install software-properties-common apt-transport-https && \

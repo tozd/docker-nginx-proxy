@@ -14,6 +14,7 @@ ENV LOG_TO_STDOUT=0
 ENV NGINX_HTTPS_PORT=443
 ENV NGINX_HTTPS_PROTOCOLS="TLSv1.2 TLSv1.3"
 ENV NGINX_HTTPS_CIPHERS="HIGH:!aNULL:!MD5"
+ENV NGINX_HTTPS_REJECT_UNKNOWN=1
 # Containers are often connected to a network only after they start, so docker-gen also watches network
 # connect and disconnect events, in addition to its default container events.
 ENV DOCKERGEN_ARGS="-event-filter event=connect -event-filter event=disconnect"

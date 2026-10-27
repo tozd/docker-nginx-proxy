@@ -148,6 +148,15 @@ fi
 if docker exec proxy sh -c 'certbot --help all 2>/dev/null | grep -q -- --key-type'; then
   docker exec proxy openssl x509 -noout -text -in /ssl/site.test.crt | grep -q 'Public Key Algorithm: id-ecPublicKey'
 fi
+if [ "$(docker exec proxy printenv NGINX_HTTPS_REJECT_UNKNOWN)" = "1" ]; then
+  # curl fails with exit code 35 when the TLS handshake is rejected.
+  code=0
+  curl -s -k -o /dev/null --resolve "unknown.test:443:$ADDRESS" https://unknown.test || code=$?
+  if [ "$code" -ne 35 ]; then
+    echo "TLS handshake for an unknown host was not rejected (curl exit code $code)"
+    exit 1
+  fi
+fi
 echo "Success"
 
 echo "Reconfiguring app Docker image"

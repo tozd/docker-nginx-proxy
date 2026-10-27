@@ -36,6 +36,8 @@ Available as:
 - `NGINX_HTTPS_PORT`: If set, listen on this port for HTTPS traffic instead of the default `443`.
 - `NGINX_HTTPS_PROTOCOLS`: Sets [SSL protocols](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_protocols) for HTTPS virtual hosts. Default is `TLSv1.2 TLSv1.3`.
 - `NGINX_HTTPS_CIPHERS`: Sets [SSL ciphers](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_ciphers) for HTTPS virtual hosts. Default is `HIGH:!aNULL:!MD5`.
+- `NGINX_HTTPS_REJECT_UNKNOWN`: If set to `1`, TLS handshakes for hosts without HTTPS and for clients which do not send a hostname are rejected, instead of being completed with the certificate of another host. Nginx then listens for HTTPS traffic even when no host has HTTPS. Requires nginx 1.19.4 or newer. Default is `1` on `ubuntu-noble` and `ubuntu-resolute` tags and `0` on others. Set it to `0` if you provide your own default HTTPS server.
+- `DOCKERGEN_ARGS`: Additional arguments for docker-gen. Default on `ubuntu-resolute` tag is `-event-filter event=connect -event-filter event=disconnect`, so that the configuration is generated again also when containers are connected to or disconnected from networks. Not set on other tags.
 
 ## Description
 
@@ -106,7 +108,8 @@ SSL key for a virtual host.
 For host `example.com` you should provide `/ssl/example.com.key` and `/ssl/example.com.crt`
 files. Certificate file should contain the full chain needed to validate the certificate.
 If those two files exist, the image will automatically configure the virtual host to use HTTPS and redirect any
-non-HTTPS traffic to HTTPS.
+non-HTTPS traffic to HTTPS. When `NGINX_HTTPS_REJECT_UNKNOWN` is set to `1`, HTTPS connections for hosts without
+those two files are rejected.
 
 If you want any extra configuration for non-HTTPS traffic, you can provide `/ssl/example.com_nonssl.conf` file which
 will be included for the non-HTTPS configuration. Similarly, for extra configuration for the HTTPS site, provide

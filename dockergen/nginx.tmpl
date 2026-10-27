@@ -1,5 +1,18 @@
 # Based on https://github.com/jwilder/docker-gen/blob/master/templates/nginx.tmpl
 
+{{ if eq $.Env.NGINX_HTTPS_REJECT_UNKNOWN "1" }}
+# Rejects TLS handshakes for hosts without HTTPS (and for clients which do not send a hostname),
+# instead of completing them with the certificate of another host.
+server {
+    listen {{ or $.Env.NGINX_HTTPS_PORT "443" }} ssl default_server;
+    ssl_reject_handshake on;
+    access_log /var/log/nginx/default_access.log json;
+
+    # Requests whose Host header names a host without HTTPS are answered here, after a handshake for another host.
+    return 404;
+}
+{{ end }}
+
 {{ range $host, $containersByHost := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 
 {{ range $url, $containers := groupByMulti $containersByHost "Env.VIRTUAL_URL" "," }}
