@@ -1,0 +1,6 @@
+# nginx fails to start when the unix socket it should listen on already exists, which happens when nginx did not
+# exit cleanly (e.g., the container was killed). Only nginx uses the socket and nginx is not running here, so the
+# socket is removed.
+if [[ "${NGINX_HTTPS_PORT}" == unix:* ]] && [ -S "${NGINX_HTTPS_PORT#unix:}" ]; then
+  rm -f "${NGINX_HTTPS_PORT#unix:}"
+fi
