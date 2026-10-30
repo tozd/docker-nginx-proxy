@@ -33,7 +33,7 @@ Available as:
 - `LETSENCRYPT_EMAIL`: If set, enables automatic generation of SSL keys using [Let's encrypt](https://letsencrypt.org/) service. By setting it you agree to [Let’s Encrypt Subscriber Agreement](https://letsencrypt.org/repository/).
 - `LETSENCRYPT_ARGS`: Any additional arguments you might want to pass to Let's encrypt's certbot.
 - `LOG_TO_STDOUT`: If set to `1` output logs to stdout (retrievable using `docker logs`) instead of log volumes.
-- `NGINX_HTTPS_PORT`: If set, listen on this port for HTTPS traffic instead of the default `443`.
+- `NGINX_HTTPS_PORT`: If set, listen on this port for HTTPS traffic instead of the default `443`. It can also be a unix socket (e.g., `unix:/var/run/nginx.sock`), see [TLS passthrough](#tls-passthrough).
 - `NGINX_HTTPS_PROTOCOLS`: Sets [SSL protocols](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_protocols) for HTTPS virtual hosts. Default is `TLSv1.2 TLSv1.3`.
 - `NGINX_HTTPS_CIPHERS`: Sets [SSL ciphers](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_ciphers) for HTTPS virtual hosts. Default is `HIGH:!aNULL:!MD5`.
 - `NGINX_HTTPS_REJECT_UNKNOWN`: If set to `1`, TLS handshakes for hosts without HTTPS and for clients which do not send a hostname are rejected, instead of being completed with the certificate of another host. Nginx then listens for HTTPS traffic even when no host has HTTPS. Requires nginx 1.19.4 or newer. Default is `1` on `ubuntu-noble` and `ubuntu-resolute` tags and `0` on others. Set it to `0` if you provide your own default HTTPS server.
@@ -138,6 +138,139 @@ For e-mail sending to work you have to configure at least [`REMOTES` environment
 as well.
 
 You can list in `/ssl/letsencrypt.manual.list` file additional domains you want the container to obtain SSL keys.
+
+### TLS passthrough
+
+HTTPS connections can also be passed to containers without terminating TLS in this image, based on the hostname
+the client sends at the start of the TLS handshake (SNI). Such a container holds its own private key and obtains its
+own certificate, and traffic stays encrypted until it reaches the container. This uses Nginx's
+[`ssl_preread`](https://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html) and
+[`pass`](https://nginx.org/en/docs/stream/ngx_stream_pass_module.html) in the stream module. The configuration below
+requires Nginx 1.27.3 or newer. Nginx includes all files in `/etc/nginx/stream.d/` into its `stream` block.
+
+To set it up:
+
+1. Set `NGINX_HTTPS_PORT` to `unix:/var/run/nginx.sock`, so that HTTPS virtual hosts of this image listen on a unix
+   socket and port 443 is free for the stream proxy.
+
+2. Mount a stream configuration file into `/etc/nginx/stream.d/`, for example:
+
+   ```nginx
+   resolver 127.0.0.11 valid=5s;
+   # After a failed lookup, names are looked up again after this timeout (30 seconds by default).
+   resolver_timeout 5s;
+
+   map $ssl_preread_server_name $target_backend {
+       include /etc/nginx/mapstreams.d/*.conf;
+
+       default nginx_proxy;
+   }
+
+   # Listener to which a connection is passed.
+   map $target_backend $front {
+       # HTTPS virtual hosts of this image.
+       nginx_proxy unix:/var/run/nginx.sock;
+
+       # Upstreams which accept the PROXY protocol, with the listener which sends it.
+       include /etc/nginx/proxyprotocol.d/*.conf;
+
+       # All other upstreams, with the listener which does not send the PROXY protocol.
+       default 127.0.0.1:10002;
+   }
+
+   include /etc/nginx/upstreams.d/*.conf;
+
+   server {
+       listen 443;
+       ssl_preread on;
+       pass $front;
+   }
+
+   # For upstreams which accept the PROXY protocol, it sends them the client's address.
+   server {
+       listen 127.0.0.1:10001;
+       ssl_preread on;
+       proxy_pass $target_backend;
+       proxy_protocol on;
+   }
+
+   # For upstreams which do not accept the PROXY protocol.
+   server {
+       listen 127.0.0.1:10002;
+       ssl_preread on;
+       proxy_pass $target_backend;
+   }
+   ```
+
+   Also mount directories at `/etc/nginx/mapstreams.d/`, `/etc/nginx/upstreams.d/`, and
+   `/etc/nginx/proxyprotocol.d/`, so that deployments of each container can add their own files to them.
+
+3. For each container, add a file to `/etc/nginx/mapstreams.d/` which maps the container's hostnames to the name of
+   its upstream, e.g., `/etc/nginx/mapstreams.d/app.conf`:
+
+   ```nginx
+   app.example.com app;
+   ```
+
+   And a file with the upstream to `/etc/nginx/upstreams.d/`, e.g., `/etc/nginx/upstreams.d/app.conf`:
+
+   ```nginx
+   upstream app {
+       zone app 64k;
+       server app:443 resolve;
+   }
+   ```
+
+   Connections for `app.example.com` are then proxied to port 443 of the container with hostname `app`, which has
+   to be on a network shared with this image. With `resolve`, Nginx resolves the container's address again when it
+   changes. `127.0.0.11` is the DNS resolver provided by Docker, or by this image when Docker does not provide one.
+
+4. Run the container with `VIRTUAL_HOST` (and `VIRTUAL_URL` or `VIRTUAL_ALIAS`) as usual, so that this image proxies
+   non-HTTPS traffic to it (e.g., for redirects to HTTPS or for HTTP-01 challenges). Do not set `VIRTUAL_LETSENCRYPT`
+   because the container obtains its certificate itself.
+
+The server on port 443 passes the client's connection itself (instead of opening a new one) to a listener.
+Connections for hostnames without a file in `/etc/nginx/mapstreams.d/` are passed to HTTPS virtual hosts of this
+image, which see the client's address. Connections for containers' upstreams are passed to one of the two listeners
+on the loopback interface, which proxy them to the containers.
+
+When `NGINX_HTTPS_REJECT_UNKNOWN` is set to `1`, connections for hostnames without a passthrough entry and without
+an HTTPS virtual host (and connections without a hostname) are rejected during the TLS handshake.
+
+#### PROXY protocol
+
+Containers receive passed through connections from the address of the container of this image, unless they accept the
+[PROXY protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt), with which the client's address is
+sent to them. For such a container, add a file to `/etc/nginx/proxyprotocol.d/` which maps the name of its upstream
+to the listener which sends the PROXY protocol header, e.g., `/etc/nginx/proxyprotocol.d/app.conf`:
+
+```nginx
+app 127.0.0.1:10001;
+```
+
+Other containers use the listener on port 10002, which does not send the PROXY protocol header.
+
+The listener which sends the PROXY protocol header has to listen on a TCP port and not on a unix socket, because
+after `pass` Nginx sends an invalid PROXY protocol header for the latter
+([nginx/nginx#1912](https://github.com/nginx/nginx/issues/1912)).
+
+If this image receives connections from IPv6 clients (`listen [::]:443;`), the listener has to have the same address
+family as the client, because Nginx otherwise sends an invalid PROXY protocol header
+([nginx/nginx#1609](https://github.com/nginx/nginx/issues/1609)). Add `listen [::1]:10001;` to the listener, add a
+map which picks the listener based on the client's address:
+
+```nginx
+map $remote_addr $proxy_protocol_listener {
+    ~:      [::1]:10001;
+    default 127.0.0.1:10001;
+}
+```
+
+And use it in files in `/etc/nginx/proxyprotocol.d/`, e.g., `/etc/nginx/proxyprotocol.d/app.conf`:
+
+```nginx
+app $proxy_protocol_listener;
+```
 
 ## Dynamic resolving of containers
 
